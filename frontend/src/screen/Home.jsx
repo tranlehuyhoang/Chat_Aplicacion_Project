@@ -1,10 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import NavBarUser from '../components/common/NavBarUser.jsx'
 import ChatInput from '../components/common/ChatInput.jsx'
 import UserProfile from '../components/common/UserProfile.jsx'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 const Home = () => {
+    const navigate = useNavigate();
+
+    const redux = useSelector((state) => state);
+    const { userInfo } = useSelector((state) => state.auth);
+    console.log(userInfo)
+    useEffect(() => {
+        if (!userInfo) {
+            navigate('./login')
+        }
+    }, [userInfo]);
     return (
         <div className="user-chat w-100 overflow-hidden">
             <div className="d-lg-flex">

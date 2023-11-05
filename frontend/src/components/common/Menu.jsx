@@ -1,17 +1,27 @@
 import React from 'react'
-
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import { logout } from '../../slices/authSlice';
 const Menu = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        console.log('logout')
+        dispatch(logout());
+        navigate('./login')
+    }
     return (
         <div>
             <div className="side-menu flex-lg-column me-lg-1 ms-lg-0">
                 {/* LOGO */}
                 <div className="navbar-brand-box">
-                    <a href="index.html" className="logo logo-dark">
+                    <a href="./chat" className="logo logo-dark">
                         <span className="logo-sm">
                             <img src="assets/images/logo.svg" alt="" height={30} />
                         </span>
                     </a>
-                    <a href="index.html" className="logo logo-light">
+                    <a href="./chat" className="logo logo-light">
                         <span className="logo-sm">
                             <img src="assets/images/logo.svg" alt="" height={30} />
                         </span>
@@ -128,10 +138,10 @@ const Menu = () => {
                                     <i className="ri-settings-3-line float-end text-muted" />
                                 </a>
                                 <div className="dropdown-divider" />
-                                <a className="dropdown-item" href="#">
+                                <button className="dropdown-item" onClick={handleLogout}>
                                     Log out{" "}
                                     <i className="ri-logout-circle-r-line float-end text-muted" />
-                                </a>
+                                </button>
                             </div>
                         </li>
                     </ul>
@@ -175,10 +185,10 @@ const Menu = () => {
                                     <i className="ri-settings-3-line float-end text-muted" />
                                 </a>
                                 <div className="dropdown-divider" />
-                                <a className="dropdown-item" href="auth-login.html">
+                                <button className="dropdown-item" onClick={handleLogout} >
                                     Log out{" "}
                                     <i className="ri-logout-circle-r-line float-end text-muted" />
-                                </a>
+                                </button>
                             </div>
                         </li>
                     </ul>

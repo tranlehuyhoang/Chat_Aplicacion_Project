@@ -1,6 +1,35 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useRegisterMutation } from '../slices/UserApi';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import { setCredentials } from '../slices/authSlice';
 
 const Register = () => {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const [register, { isLoading }] = useRegisterMutation();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        console.log(username, password)
+        try {
+            const res = await register({ username: username, password: password }).unwrap();
+
+            dispatch(setCredentials({ ...res }));
+            toast.success('Register Success!');
+
+            navigate('/');
+        } catch (err) {
+            toast.error(err?.data?.message || err.error);
+        }
+        setUsername('')
+        setPassword('')
+    }
     return (
         <>
             <>
@@ -27,7 +56,7 @@ const Register = () => {
                         <div className="row justify-content-center">
                             <div className="col-md-8 col-lg-6 col-xl-5">
                                 <div className="text-center mb-4">
-                                    <a href="index.html" className="auth-logo mb-5 d-block">
+                                    <a href="./chat" className="auth-logo mb-5 d-block">
                                         <img
                                             src="assets/images/logo-dark.png"
                                             alt=""
@@ -47,25 +76,8 @@ const Register = () => {
                                 <div className="card">
                                     <div className="card-body p-4">
                                         <div className="p-3">
-                                            <form action="index.html">
-                                                <div className="mb-3">
-                                                    <label className="form-label">Email</label>
-                                                    <div className="input-group bg-light-subtle rounded-3  mb-3">
-                                                        <span
-                                                            className="input-group-text text-muted"
-                                                            id="basic-addon5"
-                                                        >
-                                                            <i className="ri-mail-line" />
-                                                        </span>
-                                                        <input
-                                                            type="email"
-                                                            className="form-control form-control-lg bg-light-subtle border-light"
-                                                            placeholder="Enter Email"
-                                                            aria-label="Enter Email"
-                                                            aria-describedby="basic-addon5"
-                                                        />
-                                                    </div>
-                                                </div>
+                                            <form onSubmit={handleSubmit}>
+
                                                 <div className="mb-3">
                                                     <label className="form-label">Username</label>
                                                     <div className="input-group bg-light-subtle mb-3 rounded-3">
@@ -76,6 +88,9 @@ const Register = () => {
                                                             <i className="ri-user-2-line" />
                                                         </span>
                                                         <input
+                                                            value={username}
+
+                                                            onChange={e => setUsername(e.target.value)}
                                                             type="text"
                                                             className="form-control form-control-lg bg-light-subtle border-light"
                                                             placeholder="Enter Username"
@@ -94,6 +109,9 @@ const Register = () => {
                                                             <i className="ri-lock-2-line" />
                                                         </span>
                                                         <input
+                                                            onChange={e => setPassword(e.target.value)}
+                                                            value={password}
+
                                                             type="password"
                                                             className="form-control form-control-lg bg-light-subtle border-light"
                                                             placeholder="Enter Password"

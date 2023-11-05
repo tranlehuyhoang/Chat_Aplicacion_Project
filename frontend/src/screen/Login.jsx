@@ -1,6 +1,34 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useLoginMutation } from '../slices/UserApi';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import { setCredentials } from '../slices/authSlice';
 
 const Login = () => {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const [login, { isLoading }] = useLoginMutation();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await login({ username: username, password: password }).unwrap();
+
+            dispatch(setCredentials({ ...res }));
+            console.log(username, password)
+            toast.success('Login Success!');
+
+            navigate('/');
+        } catch (err) {
+            toast.error(err?.data?.message || err.error);
+        }
+        setUsername('')
+        setPassword('')
+    }
     return (
         <>
             <>
@@ -47,7 +75,7 @@ const Login = () => {
                                 <div className="card">
                                     <div className="card-body p-4">
                                         <div className="p-3">
-                                            <form action="./">
+                                            <form onSubmit={handleSubmit}>
                                                 <div className="mb-3">
                                                     <label className="form-label">Username</label>
                                                     <div className="input-group mb-3 bg-light-subtle rounded-3">
@@ -58,6 +86,9 @@ const Login = () => {
                                                             <i className="ri-user-2-line" />
                                                         </span>
                                                         <input
+                                                            value={username}
+
+                                                            onChange={e => setUsername(e.target.value)}
                                                             type="text"
                                                             className="form-control form-control-lg border-light bg-light-subtle"
                                                             placeholder="Enter Username"
@@ -84,6 +115,8 @@ const Login = () => {
                                                             <i className="ri-lock-2-line" />
                                                         </span>
                                                         <input
+                                                            onChange={e => setPassword(e.target.value)}
+                                                            value={password}
                                                             type="password"
                                                             className="form-control form-control-lg border-light bg-light-subtle"
                                                             placeholder="Enter Password"

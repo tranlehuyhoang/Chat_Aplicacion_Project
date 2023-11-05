@@ -15,13 +15,11 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<AuthLayout />}>
-            <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register />} />
-          </Route>
-          <Route path='/' element={<HomeLayout />}>
 
-            <Route path='chat' element={<Home />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/' element={<HomeLayout />}>
+            <Route path='/' element={<Home />} />
           </Route>
         </Routes>
       </BrowserRouter>

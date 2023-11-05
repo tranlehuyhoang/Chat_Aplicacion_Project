@@ -12,12 +12,13 @@ const authSlice = createSlice({
         setCredentials: (state, action) => {
             state.userInfo = action.payload;
             localStorage.setItem('userInfo', JSON.stringify(action.payload));
-            localStorage.setItem('token', JSON.stringify(action.payload._id));
-            window.location.href = "https://ps26819.vercel.app/";
+            localStorage.setItem('token', JSON.stringify(action.payload.token));
+
         },
         logout: (state, action) => {
             state.userInfo = null;
             localStorage.removeItem('userInfo');
+            localStorage.removeItem('token');
 
         },
     },
