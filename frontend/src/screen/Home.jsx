@@ -31,16 +31,27 @@ const Home = () => {
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
         ws.addEventListener('error', handleError);
-        ws.addEventListener('close', handleClose);
+        ws.addEventListener('close', () => {
+            setTimeout(() => {
+                console.log('Disconnected. Trying to reconnect.');
+                connectToWs();
+            }, 1000);
+        });
     }
 
     function handleOpen() {
         console.log('WebSocket connection opened');
     }
 
-    function handleMessage(event) {
-        console.log('Received message:', event.data);
+    function handleMessage(ev) {
+        const messageData = JSON.parse(ev.data);
+
+        if ('online' in messageData) {
+            console.log(messageData);
+        }
     }
+
+
 
     function handleError(error) {
         console.error('WebSocket error:', error);

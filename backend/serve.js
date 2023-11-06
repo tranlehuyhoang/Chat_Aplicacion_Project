@@ -27,22 +27,42 @@ app.use(errorHandler);
 const server = app.listen(port, () => console.log(`Server running on port ${port}`));
 
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
+
 wss.on('connection', (connection, req) => {
-    const token = req.cookie.jwt;
-    console.log(req.cookie)
-    if (token) {
+    const cookies = req.headers.cookie;
+    if (!cookies) {
+        return
+    }
+    const cookiePairs = cookies.split(';');
+
+    let jwtValue = null;
+    for (const pair of cookiePairs) {
+        const [name, value] = pair.trim().split('=');
+        if (name === 'jwt') {
+            jwtValue = value;
+            break;
+        }
+    }
+
+    if (jwtValue) {
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(jwtValue, process.env.JWT_SECRET);
             connection.userId = decoded;
-            connection.send(decoded);
-            console.log(decoded);
+            const jsonData = JSON.stringify(decoded);
+            connection.send(jsonData);
+            console.log(decoded.userId);
         } catch (error) {
             // Token verification failed
-            connection.send('Invalid token');
+            connection.send(error.message);
         }
     } else {
         // No token provided
         connection.send('Not authorized, no token');
         connection.close();
     }
+    [...wss.clients].forEach(client => {
+        client.send(JSON.stringify({
+            online: [...wss.clients].map(c => ({ userId: c.userId, username: c.username })),
+        }));
+    });
 });

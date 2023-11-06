@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password: password,
     });
     if (createdUser) {
-        const token = generateToken(res, createdUser._id);
+        const token = generateToken(res, createdUser._id, createdUser.username);
         res.status(201).json({
 
             name: createdUser.username,
@@ -38,7 +38,7 @@ const authUser = asyncHandler(async (req, res) => {
         const passOk = await user.matchPassword(password);
         if (passOk) {
 
-            const token = generateToken(res, user._id);
+            const token = generateToken(res, user._id, user.username);
             res.json({
                 name: user.username,
                 token: token
