@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import NavBarUser from '../components/common/NavBarUser.jsx'
 import ChatInput from '../components/common/ChatInput.jsx'
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router'
 
 const Home = () => {
     const navigate = useNavigate();
-
+    const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
     console.log(userInfo)
@@ -17,6 +17,40 @@ const Home = () => {
             navigate('./login')
         }
     }, [userInfo]);
+
+    useEffect(() => {
+
+        connectToWs();
+    }, [userInfo]);
+
+
+
+    function connectToWs() {
+        const ws = new WebSocket('ws://localhost:5000');
+        setWs(ws);
+        ws.addEventListener('open', handleOpen);
+        ws.addEventListener('message', handleMessage);
+        ws.addEventListener('error', handleError);
+        ws.addEventListener('close', handleClose);
+    }
+
+    function handleOpen() {
+        console.log('WebSocket connection opened');
+    }
+
+    function handleMessage(event) {
+        console.log('Received message:', event.data);
+    }
+
+    function handleError(error) {
+        console.error('WebSocket error:', error);
+    }
+
+    function handleClose() {
+        console.log('WebSocket connection closed');
+    }
+
+
     return (
         <div className="user-chat w-100 overflow-hidden">
             <div className="d-lg-flex">

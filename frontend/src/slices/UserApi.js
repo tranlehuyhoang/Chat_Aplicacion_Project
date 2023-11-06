@@ -1,5 +1,5 @@
 import { apiSlice } from './apiSlice.js';
-const USERS_URL = 'http://localhost:5000/api/user';
+const USERS_URL = 'api/user';
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
