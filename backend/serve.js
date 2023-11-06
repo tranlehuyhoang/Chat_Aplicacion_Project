@@ -50,7 +50,7 @@ wss.on('connection', (connection, req) => {
             connection.userId = decoded;
             const jsonData = JSON.stringify(decoded);
             connection.send(jsonData);
-            console.log(decoded.userId);
+            console.log(decoded);
         } catch (error) {
             // Token verification failed
             connection.send(error.message);

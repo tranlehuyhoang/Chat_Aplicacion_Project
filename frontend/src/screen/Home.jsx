@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router'
 
 const Home = () => {
     const navigate = useNavigate();
+    const [onlinePeople, setOnlinePeople] = useState({});
+    const [messages, setMessages] = useState([]);
     const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
-    console.log(userInfo)
+
     useEffect(() => {
         if (!userInfo) {
             navigate('./login')
@@ -26,11 +28,13 @@ const Home = () => {
 
 
     function connectToWs() {
+        if (!userInfo) {
+            return
+        }
         const ws = new WebSocket('ws://localhost:5000');
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
-        ws.addEventListener('error', handleError);
         ws.addEventListener('close', () => {
             setTimeout(() => {
                 console.log('Disconnected. Trying to reconnect.');
@@ -43,24 +47,25 @@ const Home = () => {
         console.log('WebSocket connection opened');
     }
 
+    function showOnlinePeople(peopleArray) {
+        console.log('peopleArray =>', peopleArray)
+        const people = {};
+        peopleArray.forEach(({ userId }) => {
+            people[userId] = userId.userName;
+        });
+        setOnlinePeople(people);
+    }
+
     function handleMessage(ev) {
         const messageData = JSON.parse(ev.data);
-
+        console.log({ ev, messageData });
         if ('online' in messageData) {
-            console.log(messageData);
+            console.log('onlinePeople =>', messageData)
+
+            showOnlinePeople(messageData.online);
+            console.log('onlinePeople =>', onlinePeople)
         }
     }
-
-
-
-    function handleError(error) {
-        console.error('WebSocket error:', error);
-    }
-
-    function handleClose() {
-        console.log('WebSocket connection closed');
-    }
-
 
     return (
         <div className="user-chat w-100 overflow-hidden">
