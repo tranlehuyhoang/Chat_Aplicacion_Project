@@ -6,11 +6,11 @@ import UserProfile from '../components/common/UserProfile.jsx'
 import Menu from '../components/common/Menu.jsx'
 import User from '../components/common/User.jsx'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
 
 const Home = () => {
-
+    const { id } = useParams()
     const navigate = useNavigate();
     const [onlinePeople, setOnlinePeople] = useState({});
     const [messages, setMessages] = useState([]);
@@ -19,6 +19,7 @@ const Home = () => {
     const { userInfo } = useSelector((state) => state.auth);
 
     useEffect(() => {
+        console.log('userInfo', userInfo)
         if (!userInfo) {
             navigate('./login')
         }
@@ -65,6 +66,16 @@ const Home = () => {
         }
     }
 
+    function sendMessage(ev, file = null) {
+        console.log(ev)
+        ws.send(JSON.stringify({
+            recipient: id,
+            text: ev,
+            file,
+        }));
+    }
+
+
     return (
         <>
             {/* App favicon */}
@@ -110,16 +121,19 @@ const Home = () => {
                 <div className="user-chat w-100 overflow-hidden">
                     <div className="d-lg-flex">
                         {/* start chat conversation section */}
-                        <div className="w-100 overflow-hidden position-relative">
-                            <NavBarUser />
-                            {/* end chat user head */}
-                            {/* start chat conversation */}
-                            <Chat />
-                            {/* end chat conversation end */}
-                            {/* start chat input section */}
-                            <ChatInput />
-                            {/* end chat input section */}
-                        </div>
+                        {id && (
+                            <div className="w-100 overflow-hidden position-relative">
+                                <NavBarUser />
+                                {/* end chat user head */}
+                                {/* start chat conversation */}
+                                <Chat />
+                                {/* end chat conversation end */}
+                                {/* start chat input section */}
+                                <ChatInput sendMessage={sendMessage} />
+                                {/* end chat input section */}
+                            </div>
+                        )}
+
                         {/* end chat conversation section */}
                         {/* start User profile detail sidebar */}
                         <UserProfile />

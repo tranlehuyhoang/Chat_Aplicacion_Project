@@ -1,9 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import UserBar from './UserBar';
+import { useParams } from 'react-router';
+import { useSelector } from 'react-redux';
 
 const User = ({ onlinePeopleExclOurUser }) => {
+    const { id } = useParams()
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const { userInfo } = useSelector((state) => state.auth);
+    useEffect(() => {
+        console.log(id)
+        if (id) {
+            setSelectedUserId(id);
 
+        }
+    }, []);
     const handleClick = (userId) => {
         setSelectedUserId(userId);
     };
@@ -473,14 +483,14 @@ const User = ({ onlinePeopleExclOurUser }) => {
                                 <ul className="list-unstyled chat-list chat-user-list">
 
 
-                                    {Object.keys(onlinePeopleExclOurUser).map((userId, index) => {
-                                        if (userId) {
+                                    {Object.keys(onlinePeopleExclOurUser).map((user, index) => {
+                                        if (onlinePeopleExclOurUser[user].userName !== userInfo.name) {
                                             return (
                                                 <UserBar
-                                                    key={userId}
+                                                    key={user.userId}
                                                     online={true}
-                                                    username={onlinePeopleExclOurUser[index].userName}
-                                                    userid={onlinePeopleExclOurUser[index].userId}
+                                                    username={onlinePeopleExclOurUser[user].userName}
+                                                    userid={onlinePeopleExclOurUser[user].userId}
                                                     onlinePeopleExclOurUser={onlinePeopleExclOurUser}
                                                     handleClick={handleClick}
                                                     selectedUserId={selectedUserId}

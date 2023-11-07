@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import Message from './models/MessageModel.js'
 
 dotenv.config();
 connectDB();
@@ -70,7 +71,19 @@ wss.on('connection', (connection, req) => {
     }
 
     sendOnlineUsersUpdate();
-
+    connection.on('message', async (message) => {
+        const messageData = JSON.parse(message.toString());
+        const { recipient, text, file } = messageData;
+        console.log('messageData', messageData)
+        if (recipient && (text || file)) {
+            const messageDoc = await Message.create({
+                sender: connection.userId,
+                recipient,
+                text,
+                file: file ? filename : null,
+            })
+        }
+    })
     connection.on('close', () => {
         sendOnlineUsersUpdate();
     });

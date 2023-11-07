@@ -17,9 +17,6 @@ const MessageSchema = mongoose.Schema(
 );
 
 // Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-};
 
 // Encrypt password using bcrypt
 
