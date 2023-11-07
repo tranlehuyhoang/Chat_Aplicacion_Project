@@ -47,22 +47,27 @@ wss.on('connection', (connection, req) => {
     if (jwtValue) {
         try {
             const decoded = jwt.verify(jwtValue, process.env.JWT_SECRET);
-            connection.userId = decoded;
+            connection.userId = decoded.userId;
+            connection.userName = decoded.userName;
             const jsonData = JSON.stringify(decoded);
             connection.send(jsonData);
-            console.log(decoded);
+
+
         } catch (error) {
             // Token verification failed
             connection.send(error.message);
         }
+
     } else {
         // No token provided
         connection.send('Not authorized, no token');
         connection.close();
     }
+
     [...wss.clients].forEach(client => {
         client.send(JSON.stringify({
-            online: [...wss.clients].map(c => ({ userId: c.userId, username: c.username })),
+            online: [...wss.clients].map(c => ({ userId: c.userId, userName: c.userName })),
         }));
     });
+
 });

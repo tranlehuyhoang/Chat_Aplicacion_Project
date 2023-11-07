@@ -48,7 +48,6 @@ const Home = () => {
     }
 
     function showOnlinePeople(peopleArray) {
-        console.log('peopleArray =>', peopleArray)
         const people = {};
         peopleArray.forEach(({ userId }) => {
             people[userId] = userId.userName;
@@ -58,12 +57,9 @@ const Home = () => {
 
     function handleMessage(ev) {
         const messageData = JSON.parse(ev.data);
-        console.log({ ev, messageData });
         if ('online' in messageData) {
-            console.log('onlinePeople =>', messageData)
-
+            console.log('onlinePeople =>', messageData.online)
             showOnlinePeople(messageData.online);
-            console.log('onlinePeople =>', onlinePeople)
         }
     }
 
