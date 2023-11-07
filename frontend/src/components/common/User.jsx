@@ -1,7 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import UserBar from './UserBar';
 
 const User = ({ onlinePeopleExclOurUser }) => {
+    const [selectedUserId, setSelectedUserId] = useState(null);
+
+    const handleClick = (userId) => {
+        setSelectedUserId(userId);
+    };
+
     return (
         <div className="chat-leftsidebar me-lg-1 ms-lg-0">
             <div className="tab-content">
@@ -467,15 +473,17 @@ const User = ({ onlinePeopleExclOurUser }) => {
                                 <ul className="list-unstyled chat-list chat-user-list">
 
 
-                                    {Object.keys(onlinePeopleExclOurUser).map(userId => {
+                                    {Object.keys(onlinePeopleExclOurUser).map((userId, index) => {
                                         if (userId) {
                                             return (
                                                 <UserBar
                                                     key={userId}
-                                                    id={userId}
                                                     online={true}
-                                                    username={onlinePeopleExclOurUser[userId]}
+                                                    username={onlinePeopleExclOurUser[index].userName}
+                                                    userid={onlinePeopleExclOurUser[index].userId}
                                                     onlinePeopleExclOurUser={onlinePeopleExclOurUser}
+                                                    handleClick={handleClick}
+                                                    selectedUserId={selectedUserId}
                                                 />
                                             );
                                         }

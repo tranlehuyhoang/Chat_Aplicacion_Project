@@ -19,6 +19,9 @@ function App() {
           <Route path='/' element={<Home />}>
 
           </Route>
+          <Route path='/:id' element={<Home />}>
+
+          </Route>
         </Routes>
       </BrowserRouter>
       <ToastContainer />

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
 
 const Home = () => {
+
     const navigate = useNavigate();
     const [onlinePeople, setOnlinePeople] = useState({});
     const [messages, setMessages] = useState([]);
@@ -27,6 +28,7 @@ const Home = () => {
 
         connectToWs();
     }, [userInfo]);
+
 
 
 
@@ -51,11 +53,8 @@ const Home = () => {
     }
 
     function showOnlinePeople(peopleArray) {
-        const people = {};
-        peopleArray.forEach(({ userId, userName }) => {
-            people[userId] = userName;
-        });
-        setOnlinePeople(people);
+
+        setOnlinePeople(peopleArray);
     }
 
     function handleMessage(ev) {
@@ -65,7 +64,6 @@ const Home = () => {
             showOnlinePeople(messageData.online);
         }
     }
-    const onlinePeopleExclOurUser = { ...onlinePeople };
 
     return (
         <>
@@ -106,7 +104,7 @@ const Home = () => {
                 <Menu />
                 {/* end left sidebar-menu */}
                 {/* start chat-leftsidebar */}
-                <User onlinePeopleExclOurUser={onlinePeopleExclOurUser} />
+                <User onlinePeopleExclOurUser={onlinePeople} />
                 {/* end chat-leftsidebar */}
                 {/* Start User chat */}
                 <div className="user-chat w-100 overflow-hidden">

@@ -25,17 +25,25 @@ app.use(notFound);
 app.use(errorHandler);
 
 const server = app.listen(port, () => console.log(`Server running on port ${port}`));
-
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
+
+function sendOnlineUsersUpdate() {
+    const onlineUsers = [...wss.clients].map(client => ({ userId: client.userId, userName: client.userName }));
+
+    [...wss.clients].forEach(client => {
+        client.send(JSON.stringify({ online: onlineUsers }));
+    });
+}
 
 wss.on('connection', (connection, req) => {
     const cookies = req.headers.cookie;
     if (!cookies) {
-        return
+        return;
     }
-    const cookiePairs = cookies.split(';');
 
+    const cookiePairs = cookies.split(';');
     let jwtValue = null;
+
     for (const pair of cookiePairs) {
         const [name, value] = pair.trim().split('=');
         if (name === 'jwt') {
@@ -51,23 +59,19 @@ wss.on('connection', (connection, req) => {
             connection.userName = decoded.userName;
             const jsonData = JSON.stringify(decoded);
             connection.send(jsonData);
-
-
         } catch (error) {
             // Token verification failed
             connection.send(error.message);
         }
-
     } else {
         // No token provided
         connection.send('Not authorized, no token');
         connection.close();
     }
 
-    [...wss.clients].forEach(client => {
-        client.send(JSON.stringify({
-            online: [...wss.clients].map(c => ({ userId: c.userId, userName: c.userName })),
-        }));
-    });
+    sendOnlineUsersUpdate();
 
+    connection.on('close', () => {
+        sendOnlineUsersUpdate();
+    });
 });
