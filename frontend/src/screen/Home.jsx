@@ -59,11 +59,23 @@ const Home = () => {
     }
 
     function handleMessage(ev) {
+
         const messageData = JSON.parse(ev.data);
+        console.log(messageData)
         if ('online' in messageData) {
             console.log('onlinePeople =>', messageData.online)
             showOnlinePeople(messageData.online);
+        } else if ('text' in messageData) {
+            if (messageData.sender === id) {
+                console.log('id', id, 'messageData', messageData)
+
+                setMessages(prev => [...prev, { ...messageData }]);
+                console.log('messages', messages)
+            }
+
         }
+
+
     }
 
     function sendMessage(ev, file = null) {
@@ -73,6 +85,7 @@ const Home = () => {
             text: ev,
             file,
         }));
+
     }
 
 

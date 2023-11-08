@@ -74,16 +74,28 @@ wss.on('connection', (connection, req) => {
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
         const { recipient, text, file } = messageData;
-        console.log('messageData', messageData)
+        console.log({ recipient, text, file });
+        let messageDoc; // Declare messageDoc variable outside the if block
+
         if (recipient && (text || file)) {
-            const messageDoc = await Message.create({
+            messageDoc = await Message.create({
                 sender: connection.userId,
                 recipient,
                 text,
                 file: file ? filename : null,
-            })
+            });
         }
-    })
+
+        [...wss.clients]
+            .filter(c => c.userId === recipient)
+            .forEach(c => c.send(JSON.stringify({
+                text,
+                sender: connection.userId,
+                recipient,
+                file: file ? filename : null,
+                _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
+            })));
+    });
     connection.on('close', () => {
         sendOnlineUsersUpdate();
     });
