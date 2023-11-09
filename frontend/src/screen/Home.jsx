@@ -12,8 +12,9 @@ import Chat from '../components/common/Chat.jsx'
 const Home = () => {
     const { id } = useParams()
     const navigate = useNavigate();
+    const [state, setstate] = useState([]);
     const [onlinePeople, setOnlinePeople] = useState({});
-    const [messages, setMessages] = useState([]);
+    const [messagess, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
@@ -66,16 +67,21 @@ const Home = () => {
             console.log('onlinePeople =>', messageData.online)
             showOnlinePeople(messageData.online);
         } else if ('text' in messageData) {
+            console.log('text')
             if (messageData.sender === id) {
-                console.log('id', id, 'messageData', messageData)
+                console.log('messageData.sender')
+                setstate(prevs => {
+                    if (Array.isArray(prevs)) {
+                        return [...prevs, id];
+                    } else {
+                        return [prevs, id];
+                    }
+                });
+                setMessagess(prev => ([...prev, messageData]));
 
-                setMessages(prev => [...prev, { ...messageData }]);
-                console.log('messages', messages)
             }
-
         }
-
-
+        console.log('state', state)
     }
 
     function sendMessage(ev, file = null) {
@@ -85,6 +91,8 @@ const Home = () => {
             text: ev,
             file,
         }));
+        setMessagess(prev => ([...prev, { text: ev, isOur: true }]));
+        console.log(messagess)
 
     }
 
