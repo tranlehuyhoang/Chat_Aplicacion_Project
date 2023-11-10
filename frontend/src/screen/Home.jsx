@@ -14,7 +14,7 @@ const Home = () => {
     const navigate = useNavigate();
     const [state, setstate] = useState([]);
     const [onlinePeople, setOnlinePeople] = useState({});
-    const [messagess, setMessagess] = useState([]);
+    const [messages, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
@@ -92,7 +92,7 @@ const Home = () => {
             file,
         }));
         setMessagess(prev => ([...prev, { text: ev, isOur: true }]));
-        console.log(messagess)
+        console.log(messages)
 
     }
 
@@ -147,7 +147,9 @@ const Home = () => {
                                 <NavBarUser />
                                 {/* end chat user head */}
                                 {/* start chat conversation */}
-                                <Chat />
+
+                                <Chat messages={messages} />
+
                                 {/* end chat conversation end */}
                                 {/* start chat input section */}
                                 <ChatInput sendMessage={sendMessage} />
