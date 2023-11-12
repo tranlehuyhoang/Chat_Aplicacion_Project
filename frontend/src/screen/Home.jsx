@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import NavBarUser from '../components/common/NavBarUser.jsx'
 import ChatInput from '../components/common/ChatInput.jsx'
@@ -8,8 +8,11 @@ import User from '../components/common/User.jsx'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
+import { useGetMessageMutation } from '../slices/MessageApi.js'
+import { toast } from 'react-toastify'
 
 const Home = () => {
+    const divUnderMessages = useRef();
     const { id } = useParams()
     const navigate = useNavigate();
     const [state, setstate] = useState([]);
@@ -18,6 +21,7 @@ const Home = () => {
     const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
+    const [getMessage, isLoading] = useGetMessageMutation();
 
     useEffect(() => {
         console.log('userInfo', userInfo)
@@ -27,11 +31,32 @@ const Home = () => {
     }, [userInfo]);
 
     useEffect(() => {
+        const getMess = async () => {
+            try {
+                const res = await getMessage(id).unwrap();
+                console.log('res', res)
+                setMessagess([...res])
+            } catch (err) {
+
+                toast.error(err?.data?.message || err.error);
+            }
+        }
+        if (id) {
+            getMess()
+
+        }
+    }, [id]);
+    useEffect(() => {
 
         connectToWs();
     }, [userInfo]);
 
-
+    useEffect(() => {
+        const div = divUnderMessages.current;
+        if (div) {
+            div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    }, [messages]);
 
 
     function connectToWs() {
@@ -62,7 +87,8 @@ const Home = () => {
     function handleMessage(ev) {
 
         const messageData = JSON.parse(ev.data);
-        console.log(messageData)
+        console.log('messageData', messageData)
+        console.log('messageData', messageData)
         if ('online' in messageData) {
             console.log('onlinePeople =>', messageData.online)
             showOnlinePeople(messageData.online);
@@ -91,7 +117,12 @@ const Home = () => {
             text: ev,
             file,
         }));
-        setMessagess(prev => ([...prev, { text: ev, isOur: true }]));
+        setMessagess(prev => ([...prev, {
+            text: ev,
+            sender: userInfo.id,
+            recipient: id,
+            _id: Date.now(),
+        }]));
         console.log(messages)
 
     }
@@ -148,7 +179,7 @@ const Home = () => {
                                 {/* end chat user head */}
                                 {/* start chat conversation */}
 
-                                <Chat messages={messages} />
+                                <Chat messages={messages} divUnderMessages={divUnderMessages} />
 
                                 {/* end chat conversation end */}
                                 {/* start chat input section */}

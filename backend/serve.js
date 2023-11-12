@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRouter from './routes/UserRouter.js';
+import messageRouter from './routes/MessageRouter.js';
 import { WebSocketServer } from 'ws';
 import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => res.send('Server ready'));
 
 app.use('/api/user', userRouter);
+app.use('/api/message', messageRouter);
 
 app.use(notFound);
 app.use(errorHandler);

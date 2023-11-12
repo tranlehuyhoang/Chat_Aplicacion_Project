@@ -1,14 +1,19 @@
 import React from 'react'
+import { useParams } from 'react-router'
 
-const Chat = ({ messages }) => {
+const Chat = ({ messages, divUnderMessages }) => {
+    const { id } = useParams()
     return (
         <div className="chat-conversation p-3 p-lg-4" data-simplebar="init">
-            <ul className="list-unstyled mb-0">
+            <ul className="list-unstyled " style={{ marginBottom: '100px' }}>
                 {messages.map((message, index) => (
-                    <li key={index} className={message.isOur ? "right" : ""}>
+                    <li key={index} className={message.recipient == id ? "right" : ""}>
                         <div className="conversation-list">
                             <div className="chat-avatar">
-                                <img src={message.isOur ? "assets/images/users/avatar-1.jpg" : "assets/images/users/avatar-4.jpg"} alt="" />
+                                <img src={message.recipient == id ? "assets/images/users/avatar-1.jpg" : "assets/images/users/avatar-4.jpg"} alt="" />
+                                {
+                                    console.log('message', message)
+                                }
                             </div>
                             <div className="user-chat-content">
                                 <div className="ctext-wrap">
@@ -58,6 +63,8 @@ const Chat = ({ messages }) => {
                     </li>
                 ))}
             </ul>
+            <div ref={divUnderMessages}></div>
+
         </div>
     )
 }
