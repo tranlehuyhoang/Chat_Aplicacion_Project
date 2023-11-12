@@ -25,9 +25,9 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 body: data,
             }),
         }),
-        getalls: builder.mutation({
+        getall: builder.mutation({
             query: () => ({
-                url: `https://kanban-servers.onrender.com/api/boards`,
+                url: `${USERS_URL}/all`,
                 method: 'GET',
 
             }),

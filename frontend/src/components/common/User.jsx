@@ -3,12 +3,14 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 
-const User = ({ onlinePeopleExclOurUser }) => {
+const User = ({ onlinePeopleExclOurUser, offlinePeople }) => {
+
     const { id } = useParams()
     const [selectedUserId, setSelectedUserId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
     useEffect(() => {
-        console.log(id)
+        console.log('offlinePeople', offlinePeople)
+
         if (id) {
             setSelectedUserId(id);
 
@@ -497,6 +499,21 @@ const User = ({ onlinePeopleExclOurUser }) => {
                                                 />
                                             );
                                         }
+                                    })}
+                                    {Object.keys(offlinePeople).map((user) => {
+
+                                        return (
+                                            <UserBar
+                                                key={user._id}
+                                                online={false}
+                                                username={user.username}
+                                                userid={user._id}
+                                                onlinePeopleExclOurUser={offlinePeople}
+                                                handleClick={handleClick}
+                                                selectedUserId={selectedUserId}
+                                            />
+                                        );
+
                                     })}
                                 </ul>
                             </div>

@@ -11,9 +11,7 @@ const Chat = ({ messages, divUnderMessages }) => {
                         <div className="conversation-list">
                             <div className="chat-avatar">
                                 <img src={message.recipient == id ? "assets/images/users/avatar-1.jpg" : "assets/images/users/avatar-4.jpg"} alt="" />
-                                {
-                                    console.log('message', message)
-                                }
+
                             </div>
                             <div className="user-chat-content">
                                 <div className="ctext-wrap">

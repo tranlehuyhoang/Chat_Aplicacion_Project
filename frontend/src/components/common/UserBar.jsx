@@ -17,7 +17,8 @@ const UserBar = ({ online, username, userid, onlinePeopleExclOurUser, handleClic
                 // }}
                 >
                     <div className="d-flex">
-                        <div className="chat-user-img online align-self-center me-3 ms-0">
+                        <div className={`chat-user-img ${online ? 'online' : ''} align-self-center me-3 ms-0`}>
+
                             <img
                                 src="assets/images/users/avatar-2.jpg"
                                 className="rounded-circle avatar-xs"

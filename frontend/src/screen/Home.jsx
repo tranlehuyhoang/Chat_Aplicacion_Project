@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
 import { useGetMessageMutation } from '../slices/MessageApi.js'
 import { toast } from 'react-toastify'
+import { useGetallMutation } from '../slices/UserApi.js'
 
 const Home = () => {
     const divUnderMessages = useRef();
@@ -17,14 +18,15 @@ const Home = () => {
     const navigate = useNavigate();
     const [state, setstate] = useState([]);
     const [onlinePeople, setOnlinePeople] = useState({});
+    const [offlinePeople, setOfflinePeople] = useState({});
     const [messages, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
     const [getMessage, isLoading] = useGetMessageMutation();
+    const [getall] = useGetallMutation();
 
     useEffect(() => {
-        console.log('userInfo', userInfo)
         if (!userInfo) {
             navigate('./login')
         }
@@ -34,7 +36,6 @@ const Home = () => {
         const getMess = async () => {
             try {
                 const res = await getMessage(id).unwrap();
-                console.log('res', res)
                 setMessagess([...res])
             } catch (err) {
 
@@ -50,6 +51,22 @@ const Home = () => {
 
         connectToWs();
     }, [userInfo]);
+
+    useEffect(() => {
+        const getAllUser = async () => {
+            try {
+                const res = await getall().unwrap();
+
+                const offlinePeopleArr = res.users.filter(p => p.username !== userInfo.name);
+
+                setOfflinePeople(offlinePeopleArr);
+            } catch (err) {
+                toast.error(err?.data?.message || err.error);
+            }
+        };
+
+        getAllUser();
+    }, [onlinePeople, userInfo]);
 
     useEffect(() => {
         const div = divUnderMessages.current;
@@ -87,15 +104,10 @@ const Home = () => {
     function handleMessage(ev) {
 
         const messageData = JSON.parse(ev.data);
-        console.log('messageData', messageData)
-        console.log('messageData', messageData)
         if ('online' in messageData) {
-            console.log('onlinePeople =>', messageData.online)
             showOnlinePeople(messageData.online);
         } else if ('text' in messageData) {
-            console.log('text')
             if (messageData.sender === id) {
-                console.log('messageData.sender')
                 setstate(prevs => {
                     if (Array.isArray(prevs)) {
                         return [...prevs, id];
@@ -107,11 +119,9 @@ const Home = () => {
 
             }
         }
-        console.log('state', state)
     }
 
     function sendMessage(ev, file = null) {
-        console.log(ev)
         ws.send(JSON.stringify({
             recipient: id,
             text: ev,
@@ -123,7 +133,6 @@ const Home = () => {
             recipient: id,
             _id: Date.now(),
         }]));
-        console.log(messages)
 
     }
 
@@ -165,9 +174,12 @@ const Home = () => {
             <div className="layout-wrapper d-lg-flex">
                 {/* Start left sidebar-menu */}
                 <Menu />
-                {/* end left sidebar-menu */}
-                {/* start chat-leftsidebar */}
-                <User onlinePeopleExclOurUser={onlinePeople} />
+
+                {console.log('offlinePeopleofflinePeople', offlinePeople)}
+                <User onlinePeopleExclOurUser={onlinePeople} offlinePeople={offlinePeople} />
+
+
+
                 {/* end chat-leftsidebar */}
                 {/* Start User chat */}
                 <div className="user-chat w-100 overflow-hidden">
