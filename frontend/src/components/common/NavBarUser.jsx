@@ -30,7 +30,11 @@ const NavBarUser = ({ userSelected }) => {
                                 <a href="#" className="text-reset user-profile-show">
                                     {userSelected.name}
                                 </a>{" "}
-                                <i className="ri-record-circle-fill font-size-10 text-success d-inline-block ms-1" />
+                                {userSelected.status ? (
+                                    <i className="ri-record-circle-fill font-size-10 text-success d-inline-block ms-1" />
+                                ) : (
+                                    <i className="ri-record-circle-fill font-size-10 d-inline-block ms-1" />
+                                )}
                             </h5>
                         </div>
                     </div>

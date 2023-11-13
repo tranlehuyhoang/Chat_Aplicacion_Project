@@ -128,6 +128,7 @@ const Home = () => {
         if (!ev) {
             return
         }
+
         ws.send(JSON.stringify({
             recipient: id,
             text: ev,

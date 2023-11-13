@@ -9,6 +9,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import Message from './models/MessageModel.js'
+import fs from 'fs'
 
 dotenv.config();
 connectDB();
@@ -76,9 +77,19 @@ wss.on('connection', (connection, req) => {
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
         const { recipient, text, file } = messageData;
-        console.log({ recipient, text, file });
         let messageDoc; // Declare messageDoc variable outside the if block
-
+        let filename = null;
+        if (file) {
+            const parts = file.name.split('.');
+            const ext = parts[parts.length - 1];
+            filename = Date.now() + '.' + ext;
+            const path = './uploads/' + filename;
+            const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
+            fs.writeFile(path, bufferData, () => {
+                // File đã được lưu vào thư mục "uploads"
+                // Có thể thực hiện các xử lý khác sau khi file được lưu
+            });
+        }
         if (recipient && (text || file)) {
             messageDoc = await Message.create({
                 sender: connection.userId,

@@ -1,6 +1,24 @@
 import React, { useState } from 'react'
 
 const ChatInput = ({ sendMessage }) => {
+
+    function sendFile(ev) {
+        const reader = new FileReader();
+        reader.readAsDataURL(ev.target.files[0]);
+        reader.onload = () => {
+            sendMessage(
+                ev.target.files[0].name,
+                {
+                    name: ev.target.files[0].name,
+                    data: reader.result,
+                }
+            );
+        };
+    }
+
+
+
+
     const [newMessageText, setNewMessageText] = useState('');
     return (
         <form onSubmit={e => { e.preventDefault(), sendMessage(newMessageText), setNewMessageText('') }}>
@@ -38,12 +56,13 @@ const ChatInput = ({ sendMessage }) => {
                                     data-bs-placement="top"
                                     title="Attached File"
                                 >
-                                    <button
-                                        type="button"
+                                    <input style={{ display: 'none' }} type="file" onChange={sendFile} name="file" id="fileInput" className="" />
+                                    <label
+                                        htmlFor="fileInput"
                                         className="btn btn-link text-decoration-none font-size-16 btn-lg waves-effect"
                                     >
                                         <i className="ri-attachment-line" />
-                                    </button>
+                                    </label>
                                 </li>
                                 <li className="list-inline-item">
                                     <button
