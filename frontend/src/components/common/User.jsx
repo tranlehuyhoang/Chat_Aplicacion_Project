@@ -3,21 +3,22 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 
-const User = ({ onlinePeopleExclOurUser, offlinePeople }) => {
+const User = ({ onlinePeopleExclOurUser, offlinePeople, setUserSelected }) => {
 
     const { id } = useParams()
     const [selectedUserId, setSelectedUserId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
     useEffect(() => {
-        console.log('offlinePeople', offlinePeople)
 
         if (id) {
             setSelectedUserId(id);
 
         }
-    }, []);
-    const handleClick = (userId) => {
+    }, [offlinePeople, onlinePeopleExclOurUser]);
+    const handleClick = (userId, name, status) => {
         setSelectedUserId(userId);
+        setUserSelected({ name: name, status: status })
+
     };
 
     return (
@@ -496,6 +497,7 @@ const User = ({ onlinePeopleExclOurUser, offlinePeople }) => {
                                                     onlinePeopleExclOurUser={onlinePeopleExclOurUser}
                                                     handleClick={handleClick}
                                                     selectedUserId={selectedUserId}
+                                                    status={true}
                                                 />
                                             );
                                         }
@@ -504,15 +506,17 @@ const User = ({ onlinePeopleExclOurUser, offlinePeople }) => {
 
                                         return (
                                             <UserBar
-                                                key={user._id}
+                                                key={offlinePeople[user]._id}
                                                 online={false}
-                                                username={user.username}
-                                                userid={user._id}
-                                                onlinePeopleExclOurUser={offlinePeople}
+                                                username={offlinePeople[user].username}
+                                                userid={offlinePeople[user]._id}
                                                 handleClick={handleClick}
                                                 selectedUserId={selectedUserId}
+                                                status={false}
+
                                             />
                                         );
+
 
                                     })}
                                 </ul>

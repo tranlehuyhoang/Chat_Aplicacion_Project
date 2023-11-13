@@ -9,7 +9,7 @@ const Menu = () => {
     const handleLogout = () => {
         console.log('logout')
         dispatch(logout());
-        navigate('./login')
+        navigate('/login')
     }
     return (
         <div>

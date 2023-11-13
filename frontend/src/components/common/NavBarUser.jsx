@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
-const NavBarUser = () => {
+const NavBarUser = ({ userSelected }) => {
+    useEffect(() => {
+        console.log('userSelected', userSelected)
+    }, []);
     return (
+
         <div className="p-3 p-lg-4 border-bottom user-chat-topbar">
             <div className="row align-items-center">
                 <div className="col-sm-4 col-8">
@@ -24,7 +28,7 @@ const NavBarUser = () => {
                         <div className="flex-grow-1 overflow-hidden">
                             <h5 className="font-size-16 mb-0 text-truncate">
                                 <a href="#" className="text-reset user-profile-show">
-                                    Doris Brown
+                                    {userSelected.name}
                                 </a>{" "}
                                 <i className="ri-record-circle-fill font-size-10 text-success d-inline-block ms-1" />
                             </h5>
@@ -139,6 +143,8 @@ const NavBarUser = () => {
                 </div>
             </div>
         </div>
+
+
     )
 }
 

@@ -21,6 +21,7 @@ const Home = () => {
     const [offlinePeople, setOfflinePeople] = useState({});
     const [messages, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
+    const [userSelected, setUserSelected] = useState({});
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
     const [getMessage, isLoading] = useGetMessageMutation();
@@ -28,7 +29,7 @@ const Home = () => {
 
     useEffect(() => {
         if (!userInfo) {
-            navigate('./login')
+            navigate('/login')
         }
     }, [userInfo]);
 
@@ -57,9 +58,10 @@ const Home = () => {
             try {
                 const res = await getall().unwrap();
 
-                const offlinePeopleArr = res.users.filter(p => p.username !== userInfo.name);
-
+                const offlinePeopleArr = res.users.filter(p => p.username !== userInfo.name)
+                    .filter(p => !onlinePeople.some(o => o.userId === p._id));
                 setOfflinePeople(offlinePeopleArr);
+                console.log('offlinePeople', offlinePeople)
             } catch (err) {
                 toast.error(err?.data?.message || err.error);
             }
@@ -106,6 +108,7 @@ const Home = () => {
         const messageData = JSON.parse(ev.data);
         if ('online' in messageData) {
             showOnlinePeople(messageData.online);
+            console.log('onlinePeople', messageData.online)
         } else if ('text' in messageData) {
             if (messageData.sender === id) {
                 setstate(prevs => {
@@ -122,6 +125,9 @@ const Home = () => {
     }
 
     function sendMessage(ev, file = null) {
+        if (!ev) {
+            return
+        }
         ws.send(JSON.stringify({
             recipient: id,
             text: ev,
@@ -175,8 +181,7 @@ const Home = () => {
                 {/* Start left sidebar-menu */}
                 <Menu />
 
-                {console.log('offlinePeopleofflinePeople', offlinePeople)}
-                <User onlinePeopleExclOurUser={onlinePeople} offlinePeople={offlinePeople} />
+                <User onlinePeopleExclOurUser={onlinePeople} offlinePeople={offlinePeople} setUserSelected={setUserSelected} />
 
 
 
@@ -187,7 +192,7 @@ const Home = () => {
                         {/* start chat conversation section */}
                         {id && (
                             <div className="w-100 overflow-hidden position-relative">
-                                <NavBarUser />
+                                <NavBarUser userSelected={userSelected} />
                                 {/* end chat user head */}
                                 {/* start chat conversation */}
 

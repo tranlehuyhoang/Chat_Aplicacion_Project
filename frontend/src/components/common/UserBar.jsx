@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useParams } from 'react-router-dom';
 
-const UserBar = ({ online, username, userid, onlinePeopleExclOurUser, handleClick, selectedUserId }) => {
+const UserBar = ({ online, username, userid, handleClick, selectedUserId, status }) => {
 
     return (
         <>
             <li
                 className={selectedUserId === userid ? "active" : ""}
-                onClick={() => handleClick(userid)}
+                onClick={() => handleClick(userid, username, status)}
             >
                 <NavLink
                     to={'/' + userid}
