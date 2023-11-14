@@ -125,15 +125,29 @@ const Home = () => {
     }
 
     function sendMessage(ev, file = null) {
-        if (!ev) {
-            return
-        }
+        console.log('file', file)
 
+        console.log({
+            text: ev,
+            sender: userInfo.id,
+            recipient: id,
+            _id: Date.now(),
+        })
         ws.send(JSON.stringify({
             recipient: id,
             text: ev,
             file,
         }));
+        if (file) {
+            setMessagess(prev => ([...prev, {
+                text: ev,
+                sender: userInfo.id,
+                recipient: id,
+                _id: Date.now(),
+                file: file
+            }]));
+            return
+        }
         setMessagess(prev => ([...prev, {
             text: ev,
             sender: userInfo.id,
