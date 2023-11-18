@@ -1,7 +1,8 @@
 import asyncHandler from 'express-async-handler';
 
-import User from '../models/userModel.js';
+
 import generateToken from '../utils/generateToken.js';
+import User from '../models/UserModel.js';
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
@@ -21,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
         const token = generateToken(res, createdUser._id, createdUser.username);
         res.status(201).json({
 
-            name: createdUser.username,
+            user: createdUser,
             token: token
         });
 
@@ -40,7 +41,7 @@ const authUser = asyncHandler(async (req, res) => {
 
             const token = generateToken(res, user._id, user.username);
             res.json({
-                name: user.username,
+                user: user,
                 token: token
             });
         } else {
@@ -63,11 +64,14 @@ const getProfileUser = asyncHandler(async (req, res) => {
 
 
 const getAllUser = asyncHandler(async (req, res) => {
-    const users = await User.find({}, { '_id': 1, username: 1 });
-    res.status(200).json({
-        users
-    })
+    const users = await User.find();
+    const userArray = users.map(user => ({
+        user: user,
+        status: false
+    }));
 
+    res.status(200).json(userArray);
+    // console.log('users', userArray);
 });
 export {
     registerUser, authUser, getProfileUser, getAllUser

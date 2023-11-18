@@ -8,18 +8,18 @@ const userSchema = mongoose.Schema(
             required: true,
             unique: true,
         },
-
         password: {
             type: String,
             required: true
+        },
+        avatar: {
+            type: String,
+            default: "https://avatars.githubusercontent.com/u/111523395?v=4"
         }
-
     },
     {
         timestamps: true,
-
     }
-
 );
 
 // Match user entered password to hashed password in database

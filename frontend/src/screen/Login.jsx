@@ -19,6 +19,7 @@ const Login = () => {
             const res = await login({ username: username, password: password }).unwrap();
 
             dispatch(setCredentials({ ...res }));
+            console.log('res', res)
             console.log(username, password)
             toast.success('Login Success!');
 

@@ -17,7 +17,7 @@ const Home = () => {
     const { id } = useParams()
     const navigate = useNavigate();
     const [state, setstate] = useState([]);
-    const [onlinePeople, setOnlinePeople] = useState({});
+    const [usersStatus, setUsersStatus] = useState({});
     const [offlinePeople, setOfflinePeople] = useState({});
     const [messages, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
@@ -49,26 +49,8 @@ const Home = () => {
         }
     }, [id]);
     useEffect(() => {
-
         connectToWs();
     }, [userInfo]);
-
-    useEffect(() => {
-        const getAllUser = async () => {
-            try {
-                const res = await getall().unwrap();
-
-                const offlinePeopleArr = res.users.filter(p => p.username !== userInfo.name)
-                    .filter(p => !onlinePeople.some(o => o.userId === p._id));
-                setOfflinePeople(offlinePeopleArr);
-                console.log('offlinePeople', offlinePeople)
-            } catch (err) {
-                toast.error(err?.data?.message || err.error);
-            }
-        };
-
-        getAllUser();
-    }, [onlinePeople, userInfo]);
 
     useEffect(() => {
         const div = divUnderMessages.current;
@@ -100,15 +82,15 @@ const Home = () => {
 
     function showOnlinePeople(peopleArray) {
 
-        setOnlinePeople(peopleArray);
+        setUsersStatus(peopleArray);
+        console.log('onlinePeople', usersStatus)
     }
 
     function handleMessage(ev) {
-
         const messageData = JSON.parse(ev.data);
-        if ('online' in messageData) {
-            showOnlinePeople(messageData.online);
-            console.log('onlinePeople', messageData.online)
+        console.log('mess from server', messageData)
+        if ('usersStatus' in messageData) {
+            showOnlinePeople(messageData.usersStatus);
         } else if ('text' in messageData) {
             if (messageData.sender === id) {
                 setstate(prevs => {
@@ -167,7 +149,7 @@ const Home = () => {
                 {/* Start left sidebar-menu */}
                 <Menu />
 
-                <User onlinePeople={onlinePeople} offlinePeople={offlinePeople} setUserSelected={setUserSelected} />
+                <User usersStatus={usersStatus} setUserSelected={setUserSelected} />
 
 
 

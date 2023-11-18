@@ -3,7 +3,7 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 
-const User = ({ onlinePeople, offlinePeople, setUserSelected }) => {
+const User = ({ usersStatus, setUserSelected }) => {
 
     const { id } = useParams()
     const [selectedUserId, setSelectedUserId] = useState(null);
@@ -14,7 +14,7 @@ const User = ({ onlinePeople, offlinePeople, setUserSelected }) => {
             setSelectedUserId(id);
 
         }
-    }, [offlinePeople, onlinePeople]);
+    }, [usersStatus]);
     const handleClick = (userId, name, status) => {
         setSelectedUserId(userId);
         setUserSelected({ name: name, status: status })
@@ -401,81 +401,8 @@ const User = ({ onlinePeople, offlinePeople, setUserSelected }) => {
                         {/* .p-4 */}
                         {/* Start user status */}
                         <div className="px-4 pb-4" dir="ltr">
-                            <div className="owl-carousel owl-theme" id="user-status-carousel">
-                                <div className="item">
-                                    <a href="#" className="user-status-box">
-                                        <div className="avatar-xs mx-auto d-block chat-user-img online">
-                                            <img
-                                                src="assets/images/users/avatar-2.jpg"
-                                                alt="user-img"
-                                                className="img-fluid rounded-circle"
-                                            />
-                                            <span className="user-status" />
-                                        </div>
-                                        <h5 className="font-size-13 text-truncate mt-3 mb-1">
-                                            Patrick
-                                        </h5>
-                                    </a>
-                                </div>
-                                <div className="item">
-                                    <a href="#" className="user-status-box">
-                                        <div className="avatar-xs mx-auto d-block chat-user-img online">
-                                            <img
-                                                src="assets/images/users/avatar-4.jpg"
-                                                alt="user-img"
-                                                className="img-fluid rounded-circle"
-                                            />
-                                            <span className="user-status" />
-                                        </div>
-                                        <h5 className="font-size-13 text-truncate mt-3 mb-1">
-                                            Doris
-                                        </h5>
-                                    </a>
-                                </div>
-                                <div className="item">
-                                    <a href="#" className="user-status-box">
-                                        <div className="avatar-xs mx-auto d-block chat-user-img online">
-                                            <img
-                                                src="assets/images/users/avatar-5.jpg"
-                                                alt="user-img"
-                                                className="img-fluid rounded-circle"
-                                            />
-                                            <span className="user-status" />
-                                        </div>
-                                        <h5 className="font-size-13 text-truncate mt-3 mb-1">
-                                            Emily
-                                        </h5>
-                                    </a>
-                                </div>
-                                <div className="item">
-                                    <a href="#" className="user-status-box">
-                                        <div className="avatar-xs mx-auto d-block chat-user-img online">
-                                            <img
-                                                src="assets/images/users/avatar-6.jpg"
-                                                alt="user-img"
-                                                className="img-fluid rounded-circle"
-                                            />
-                                            <span className="user-status" />
-                                        </div>
-                                        <h5 className="font-size-13 text-truncate mt-3 mb-1">
-                                            Steve
-                                        </h5>
-                                    </a>
-                                </div>
-                                <div className="item">
-                                    <a href="#" className="user-status-box">
-                                        <div className="avatar-xs mx-auto d-block chat-user-img online">
-                                            <span className="avatar-title rounded-circle bg-primary-subtle text-primary">
-                                                T
-                                            </span>
-                                            <span className="user-status" />
-                                        </div>
-                                        <h5 className="font-size-13 text-truncate mt-3 mb-1">
-                                            Teresa
-                                        </h5>
-                                    </a>
-                                </div>
-                            </div>
+
+
                             {/* end user status carousel */}
                         </div>
                         {/* end user status */}
@@ -484,41 +411,24 @@ const User = ({ onlinePeople, offlinePeople, setUserSelected }) => {
                             <h5 className="mb-3 px-3 font-size-16">Recent</h5>
                             <div className="chat-message-list px-2" data-simplebar="">
                                 <ul className="list-unstyled chat-list chat-user-list">
-
-
-                                    {Object.keys(onlinePeople).map((user, index) => {
-                                        if (onlinePeople[user].userName !== userInfo.name) {
-                                            return (
-                                                <UserBar
-                                                    key={user.userId}
-                                                    online={true}
-                                                    username={onlinePeople[user].userName}
-                                                    userid={onlinePeople[user].userId}
-                                                    onlinePeople={onlinePeople}
-                                                    handleClick={handleClick}
-                                                    selectedUserId={selectedUserId}
-                                                    status={true}
-                                                />
-                                            );
-                                        }
-                                    })}
-                                    {Object.keys(offlinePeople).map((user) => {
-
+                                    {Object.keys(usersStatus).map((user, index) => {
+                                        console.log('user', usersStatus[user].user)
                                         return (
                                             <UserBar
-                                                key={offlinePeople[user]._id}
-                                                online={false}
-                                                username={offlinePeople[user].username}
-                                                userid={offlinePeople[user]._id}
+                                                key={user}
+                                                status={usersStatus[user].status}
+                                                username={usersStatus[user].user.username}
+                                                userid={usersStatus[user].user._id}
+                                                usersStatus={usersStatus}
                                                 handleClick={handleClick}
                                                 selectedUserId={selectedUserId}
-                                                status={false}
+                                                avatar={usersStatus[user].user.avatar}
 
                                             />
                                         );
 
-
                                     })}
+
                                 </ul>
                             </div>
                         </div>

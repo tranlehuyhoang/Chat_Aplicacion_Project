@@ -1,4 +1,7 @@
 import express from 'express';
+import User from './models/UserModel.js';
+import Message from './models/MessageModel.js';
+
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRouter from './routes/UserRouter.js';
@@ -8,8 +11,9 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import Message from './models/MessageModel.js'
+
 import fs from 'fs'
+
 
 dotenv.config();
 connectDB();
@@ -22,33 +26,33 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./uploads'));
 app.get('/', (req, res) => res.send('Server ready'));
-
 app.use('/api/user', userRouter);
 app.use('/api/message', messageRouter);
-
 app.use(notFound);
 app.use(errorHandler);
-
 const server = app.listen(port, () => console.log(`Server running on port ${port}`));
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
 
-function sendOnlineUsersUpdate() {
-    const onlineUsers = [...wss.clients].map(client => ({ userId: client.userId, userName: client.userName }));
-
-    [...wss.clients].forEach(client => {
-        client.send(JSON.stringify({ online: onlineUsers }));
+async function sendStatusUsers() {
+    const users = await User.find();
+    const onlineUsers = [...wss.clients]
+    const usersStatus = users.map(user => {
+        const status = onlineUsers.some(client => user._id.toString() === client.userId)
+        return { user, status };
     });
+    // console.log('usersStatus', usersStatus);
+    [...wss.clients]
+        .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
+
 }
 
-wss.on('connection', (connection, req) => {
+wss.on('connection', async (connection, req) => {
     const cookies = req.headers.cookie;
     if (!cookies) {
         return;
     }
-
     const cookiePairs = cookies.split(';');
     let jwtValue = null;
-
     for (const pair of cookiePairs) {
         const [name, value] = pair.trim().split('=');
         if (name === 'jwt') {
@@ -56,29 +60,26 @@ wss.on('connection', (connection, req) => {
             break;
         }
     }
-
     if (jwtValue) {
         try {
             const decoded = jwt.verify(jwtValue, process.env.JWT_SECRET);
+            const user = await User.findOne({ _id: decoded.userId });
             connection.userId = decoded.userId;
-            connection.userName = decoded.userName;
-            const jsonData = JSON.stringify(decoded);
-            connection.send(jsonData);
+            connection.user = user;
         } catch (error) {
-            // Token verification failed
             connection.send(error.message);
         }
     } else {
-        // No token provided
         connection.send('Not authorized, no token');
         connection.close();
     }
 
-    sendOnlineUsersUpdate();
+    sendStatusUsers();
+
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
         const { recipient, text, file } = messageData;
-        let messageDoc; // Declare messageDoc variable outside the if block
+        let messageDoc;
         let filename = null;
         if (file) {
             const parts = file.name.split('.');
@@ -87,8 +88,6 @@ wss.on('connection', (connection, req) => {
             const path = './uploads/' + filename;
             const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
             fs.writeFile(path, bufferData, () => {
-                // File đã được lưu vào thư mục "uploads"
-                // Có thể thực hiện các xử lý khác sau khi file được lưu
             });
         }
         if (recipient && (text || file)) {
@@ -111,6 +110,6 @@ wss.on('connection', (connection, req) => {
             })));
     });
     connection.on('close', () => {
-        sendOnlineUsersUpdate();
+        sendStatusUsers();
     });
 });
