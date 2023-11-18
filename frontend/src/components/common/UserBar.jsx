@@ -8,10 +8,11 @@ const UserBar = ({ status, username, userid, handleClick, selectedUserId, avatar
     const dispatch = useDispatch();
 
     useEffect(() => {
+        console.log('useEffect userbar')
         if (selectedUserId == userid) {
             dispatch(setUserSelectedRedux(userInfo));
         }
-    }, []);
+    }, [selectedUserId]);
     return (
         <li
             className={selectedUserId === userid ? "active" : ""}

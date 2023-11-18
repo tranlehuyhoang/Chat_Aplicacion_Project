@@ -29,7 +29,7 @@ const NavBarUser = ({ userSelected }) => {
                         <div className="flex-grow-1 overflow-hidden">
                             <h5 className="font-size-16 mb-0 text-truncate">
                                 <a href="#" className="text-reset user-profile-show">
-                                    {redux.userSelected.userSelected?.user?.username}
+                                    {redux.userSelected.userSelected?.user?.nickname}
                                 </a>
                                 {redux.userSelected.userSelected?.status ? (
                                     <i className="ri-record-circle-fill font-size-10 text-success d-inline-block ms-1" />

@@ -7,7 +7,6 @@ import User from '../models/UserModel.js';
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    console.log(username, password)
 
     const userExists = await User.findOne({ username });
     if (userExists) {
@@ -76,9 +75,7 @@ const getAllUser = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
-    console.log('object')
     const { userid } = req.params;
-    console.log(userid)
     const { file, filename } = req.body;
     let file_name = null
 
@@ -86,7 +83,6 @@ const updateAvatar = asyncHandler(async (req, res) => {
         const parts = filename.split('.');
         const ext = parts[parts.length - 1];
         file_name = Date.now() + '.' + ext;
-        console.log(file_name)
         const path = 'uploads/' + file_name;
         const bufferData = Buffer.from(file.split(',')[1], 'base64');
         fs.writeFile(path, bufferData, () => {
@@ -101,6 +97,22 @@ const updateAvatar = asyncHandler(async (req, res) => {
     }
 
 });
+const updateNickname = asyncHandler(async (req, res) => {
+    const { userid } = req.params;
+    const { nickname } = req.body;
+    let file_name = null
+
+
+    try {
+        await User.findByIdAndUpdate(userid, { $set: { nickname: nickname } });
+        res.status(200).json({ message: 'nickname updated successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update nickname.' });
+    }
+
+
+});
 export {
-    registerUser, authUser, getProfileUser, getAllUser, updateAvatar
+    registerUser, authUser, getProfileUser, getAllUser, updateAvatar, updateNickname
 }

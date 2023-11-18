@@ -3,11 +3,13 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserSelectedRedux } from '../../slices/userSelectedSlice';
-import { useUpdateUserAvatarMutation } from '../../slices/UserApi';
+import { useUpdateUserAvatarMutation, useUpdateUserNicknameMutation } from '../../slices/UserApi';
 import { toast } from 'react-toastify';
+
 
 const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
     const [image, setImage] = useState('');
+    const [nickname, setNickname] = useState('');
 
 
 
@@ -16,9 +18,13 @@ const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
     const [updateUserAvatar, { isLoading }] = useUpdateUserAvatarMutation()
+    const [updateUserNickname] = useUpdateUserNicknameMutation()
     const redux = useSelector((state) => state);
-    console.log(redux)
+    // console.log(redux)
+
+
     const handleImageChange = async (event) => {
+
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -34,14 +40,38 @@ const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
         };
 
     };
+
     useEffect(() => {
+
+        setNickname(userInfo?.user?.nickname)
 
         if (id) {
             setSelectedUserId(id);
-
         }
-    }, [usersStatus]);
+    }, [userInfo.user._id]);
+
+
+    const handleNicknameChange = async (value) => {
+        setNickname(value);
+        handleNicknameUpdate(value)
+
+    };
+    const handleNicknameUpdate = async (value) => {
+
+
+
+        try {
+            const res = await updateUserNickname({ userid: redux.auth.userInfo.user._id, nickname: value }).unwrap();
+            sendNewAvatar()
+
+        } catch (err) {
+            toast.error(err?.data?.message || err.error);
+        }
+
+    };
+
     const handleClick = (userId, name, status, userInfo) => {
+
         setSelectedUserId(userId);
         dispatch(setUserSelectedRedux(userInfo));
 
@@ -94,7 +124,7 @@ const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
                             <div className="mb-4">
                                 <label htmlFor="avatarss" style={{ cursor: 'pointer' }}>
                                     <img
-                                        src={image || userInfo.user.avatar}
+                                        src={image || userInfo?.user?.avatar}
                                         className="rounded-circle avatar-lg img-thumbnail"
                                         alt=""
                                     />
@@ -145,8 +175,12 @@ const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
                                         <div className="accordion-body">
                                             <div>
                                                 <p className="text-muted mb-1">Nick name</p>
-                                                <input type='text' className="font-size-14" value={userInfo?.user?.nickname}>
-                                                </input>
+                                                <input
+                                                    type="text"
+                                                    className="font-size-14"
+                                                    value={nickname}
+                                                    onChange={event => handleNicknameChange(event.target.value)}
+                                                />
                                             </div>
 
                                             <div className="mt-4">
@@ -450,7 +484,7 @@ const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
                                                 <UserBar
                                                     key={user}
                                                     status={usersStatus[user].status}
-                                                    username={usersStatus[user].user.username}
+                                                    username={usersStatus[user].user.nickname}
                                                     userid={usersStatus[user].user._id}
                                                     usersStatus={usersStatus}
                                                     handleClick={handleClick}

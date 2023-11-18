@@ -10,9 +10,8 @@ import { useNavigate, useParams } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
 import { useGetMessageMutation } from '../slices/MessageApi.js'
 import { toast } from 'react-toastify'
-import { useGetallMutation } from '../slices/UserApi.js'
 import { setUserStatusRedux } from '../slices/userStatusSlice.js'
-import { setUserSelectedRedux } from '../slices/userSelectedSlice.js'
+import { setUpdateCredentials } from '../slices/authSlice.js'
 
 const Home = () => {
     const divUnderMessages = useRef();
@@ -30,10 +29,12 @@ const Home = () => {
     const [getMessage, isLoading] = useGetMessageMutation();
 
     useEffect(() => {
+
+
         if (!userInfo) {
             navigate('/login')
         }
-    }, [userInfo]);
+    }, [userInfo.user._id]);
 
 
     useEffect(() => {
@@ -53,10 +54,14 @@ const Home = () => {
         }
     }, [id]);
     useEffect(() => {
+        console.log('useEffect home')
+
         connectToWs();
-    }, [userInfo]);
+    }, [userInfo.user._id]);
 
     useEffect(() => {
+        console.log('useEffect home')
+
         const div = divUnderMessages.current;
         if (div) {
             div.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -88,28 +93,43 @@ const Home = () => {
 
         setUsersStatus(peopleArray);
     }
+    // function handleMessage(ev) {
+    //     const messageData = JSON.parse(ev.data);
+    //     console.log('mess from server', messageData.usersStatus)
+    //     const filteredUsers = messageData.usersStatus.filter(user => user.user._id === redux.auth.userInfo.user._id);
+    //     console.log('redux.auth', redux.auth)
+    //     if ('usersStatus' in messageData) {
+    //         showOnlinePeople(messageData.usersStatus);
+    //         dispatch(setUserStatusRedux(messageData.usersStatus));
+    //         dispatch(setCredentials({ userInfo: filteredUsers[0] }));
+    //         // console.log('filteredUsers', filteredUsers)
 
     function handleMessage(ev) {
         const messageData = JSON.parse(ev.data);
         console.log('mess from server', messageData)
+        const filteredUsers = messageData.usersStatus.filter(user => user.user._id === redux.auth.userInfo.user._id);
+        // console.log('filteredUsers', filteredUsers[0].user)
+        // console.log('redux.auth', redux.auth.userInfo.user)
         if ('usersStatus' in messageData) {
+            console.log('object')
             showOnlinePeople(messageData.usersStatus);
             dispatch(setUserStatusRedux(messageData.usersStatus));
-
-
-        } else if ('text' in messageData) {
-            if (messageData.sender === id) {
-                setstate(prevs => {
-                    if (Array.isArray(prevs)) {
-                        return [...prevs, id];
-                    } else {
-                        return [prevs, id];
-                    }
-                });
-                setMessagess(prev => ([...prev, messageData]));
-
-            }
+            dispatch(setUpdateCredentials({ user: filteredUsers[0].user }));
         }
+
+        // } else if ('text' in messageData) {
+        //     if (messageData.sender === id) {
+        //         setstate(prevs => {
+        //             if (Array.isArray(prevs)) {
+        //                 return [...prevs, id];
+        //             } else {
+        //                 return [prevs, id];
+        //             }
+        //         });
+        //         setMessagess(prev => ([...prev, messageData]));
+
+        //     }
+        // }
     }
 
     function sendMessage(ev, file = null) {
