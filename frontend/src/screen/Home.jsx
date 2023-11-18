@@ -148,6 +148,14 @@ const Home = () => {
         }]));
 
     }
+    function sendNewAvatar(ev, file = null) {
+
+        ws.send(JSON.stringify({
+            avatar: 'avatar',
+        }));
+
+
+    }
 
 
     return (
@@ -159,7 +167,7 @@ const Home = () => {
                 {/* Start left sidebar-menu */}
                 <Menu />
 
-                <User usersStatus={usersStatus} setUserSelected={setUserSelected} />
+                <User usersStatus={usersStatus} setUserSelected={setUserSelected} sendNewAvatar={sendNewAvatar} />
 
 
 

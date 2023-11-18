@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler';
+import fs from 'fs'
 
 
 import generateToken from '../utils/generateToken.js';
@@ -73,6 +74,33 @@ const getAllUser = asyncHandler(async (req, res) => {
     res.status(200).json(userArray);
     // console.log('users', userArray);
 });
+
+const updateAvatar = asyncHandler(async (req, res) => {
+    console.log('object')
+    const { userid } = req.params;
+    console.log(userid)
+    const { file, filename } = req.body;
+    let file_name = null
+
+    if (file) {
+        const parts = filename.split('.');
+        const ext = parts[parts.length - 1];
+        file_name = Date.now() + '.' + ext;
+        console.log(file_name)
+        const path = 'uploads/' + file_name;
+        const bufferData = Buffer.from(file.split(',')[1], 'base64');
+        fs.writeFile(path, bufferData, () => {
+        });
+        try {
+            await User.findByIdAndUpdate(userid, { $set: { avatar: 'http://localhost:5000/' + file_name } });
+            res.status(200).json({ message: 'Avatar updated successfully.' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to update avatar.' });
+        }
+    }
+
+});
 export {
-    registerUser, authUser, getProfileUser, getAllUser
+    registerUser, authUser, getProfileUser, getAllUser, updateAvatar
 }

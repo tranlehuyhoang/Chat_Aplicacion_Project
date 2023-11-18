@@ -3,8 +3,10 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserSelectedRedux } from '../../slices/userSelectedSlice';
+import { useUpdateUserAvatarMutation } from '../../slices/UserApi';
+import { toast } from 'react-toastify';
 
-const User = ({ usersStatus, setUserSelected }) => {
+const User = ({ usersStatus, setUserSelected, sendNewAvatar }) => {
     const [image, setImage] = useState('');
 
 
@@ -13,19 +15,24 @@ const User = ({ usersStatus, setUserSelected }) => {
     const dispatch = useDispatch();
     const [selectedUserId, setSelectedUserId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
+    const [updateUserAvatar, { isLoading }] = useUpdateUserAvatarMutation()
     const redux = useSelector((state) => state);
-
-    const handleImageChange = (event) => {
+    console.log(redux)
+    const handleImageChange = async (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
+        reader.readAsDataURL(file);
 
-        reader.onloadend = () => {
+        reader.onload = async () => {
             setImage(reader.result);
+            try {
+                const res = await updateUserAvatar({ userid: redux.auth.userInfo.user._id, file: reader.result, filename: file.name }).unwrap();
+                sendNewAvatar()
+            } catch (err) {
+                toast.error(err?.data?.message || err.error);
+            }
         };
 
-        if (file) {
-            reader.readAsDataURL(file);
-        }
     };
     useEffect(() => {
 
@@ -87,7 +94,7 @@ const User = ({ usersStatus, setUserSelected }) => {
                             <div className="mb-4">
                                 <label htmlFor="avatarss" style={{ cursor: 'pointer' }}>
                                     <img
-                                        src={image || (userInfo?.user?.avatar)}
+                                        src={image || userInfo.user.avatar}
                                         className="rounded-circle avatar-lg img-thumbnail"
                                         alt=""
                                     />
@@ -96,15 +103,14 @@ const User = ({ usersStatus, setUserSelected }) => {
 
                             </div>
                             <h5 className="font-size-16 mb-1 text-truncate">
-                                {userInfo?.user?.username}
+                                {userInfo?.user?.nickname}
                             </h5>
                             <p className="text-muted text-truncate mb-1">
-                                <i className="ri-record-circle-fill font-size-10 text-success me-1 ms-0 d-inline-block" />{" "}
+                                <i className="ri-record-circle-fill font-size-10 text-success me-1 ms-0 d-inline-block" />
                                 Active
                             </p>
                         </div>
-                        {/* End profile user */}
-                        {/* Start user-profile-desc */}
+
                         <div className="p-4 user-profile-desc" data-simplebar="">
                             <div className="text-muted">
                                 <p className="mb-4">
@@ -138,21 +144,20 @@ const User = ({ usersStatus, setUserSelected }) => {
                                     >
                                         <div className="accordion-body">
                                             <div>
-                                                <p className="text-muted mb-1">Name</p>
-                                                <h5 className="font-size-14">Patricia Smith</h5>
+                                                <p className="text-muted mb-1">Nick name</p>
+                                                <input type='text' className="font-size-14" value={userInfo?.user?.nickname}>
+                                                </input>
                                             </div>
-                                            <div className="mt-4">
-                                                <p className="text-muted mb-1">Email</p>
-                                                <h5 className="font-size-14">adc@123.com</h5>
-                                            </div>
+
                                             <div className="mt-4">
                                                 <p className="text-muted mb-1">Time</p>
-                                                <h5 className="font-size-14">11:40 AM</h5>
+                                                <h5 className="font-size-14">
+                                                    {userInfo?.user?.createdAt && (
+                                                        new Date(userInfo.user.createdAt).toLocaleString()
+                                                    )}
+                                                </h5>
                                             </div>
-                                            <div className="mt-4">
-                                                <p className="text-muted mb-1">Location</p>
-                                                <h5 className="font-size-14 mb-0">California, USA</h5>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>

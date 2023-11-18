@@ -8,6 +8,12 @@ const userSchema = mongoose.Schema(
             required: true,
             unique: true,
         },
+        nickname: {
+            type: String,
+            default: function () {
+                return this.username;
+            }
+        },
         password: {
             type: String,
             required: true

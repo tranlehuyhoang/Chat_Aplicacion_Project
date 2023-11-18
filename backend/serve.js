@@ -22,8 +22,8 @@ const app = express();
 
 app.use(cors());
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('./uploads'));
 app.get('/', (req, res) => res.send('Server ready'));
 app.use('/api/user', userRouter);
@@ -79,35 +79,38 @@ wss.on('connection', async (connection, req) => {
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
         const { recipient, text, file } = messageData;
-        let messageDoc;
-        let filename = null;
-        if (file) {
-            const parts = file.name.split('.');
-            const ext = parts[parts.length - 1];
-            filename = Date.now() + '.' + ext;
-            const path = './uploads/' + filename;
-            const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
-            fs.writeFile(path, bufferData, () => {
-            });
-        }
-        if (recipient && (text || file)) {
-            messageDoc = await Message.create({
-                sender: connection.userId,
-                recipient,
-                text,
-                file: file ? filename : null,
-            });
-        }
+        // let messageDoc;
+        // let filename = null;
+        // if (file) {
+        //     const parts = file.name.split('.');
+        //     // console.log(file.data)
+        //     const ext = parts[parts.length - 1];
+        //     filename = Date.now() + '.' + ext;
+        //     const path = './uploads/' + filename;
+        //     const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
+        //     fs.writeFile(path, bufferData, () => {
+        //     });
+        // }
+        // if (recipient && (text || file)) {
+        //     messageDoc = await Message.create({
+        //         sender: connection.userId,
+        //         recipient,
+        //         text,
+        //         file: file ? filename : null,
+        //     });
+        // }
 
-        [...wss.clients]
-            .filter(c => c.userId === recipient)
-            .forEach(c => c.send(JSON.stringify({
-                text,
-                sender: connection.userId,
-                recipient,
-                file: file ? filename : null,
-                _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
-            })));
+        // [...wss.clients]
+        //     .filter(c => c.userId === recipient)
+        //     .forEach(c => c.send(JSON.stringify({
+        //         text,
+        //         sender: connection.userId,
+        //         recipient,
+        //         file: file ? filename : null,
+        //         _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
+        //     })));
+        sendStatusUsers();
+
     });
     connection.on('close', () => {
         sendStatusUsers();
