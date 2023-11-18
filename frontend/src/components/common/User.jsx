@@ -3,7 +3,7 @@ import UserBar from './UserBar';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 
-const User = ({ onlinePeopleExclOurUser, offlinePeople, setUserSelected }) => {
+const User = ({ onlinePeople, offlinePeople, setUserSelected }) => {
 
     const { id } = useParams()
     const [selectedUserId, setSelectedUserId] = useState(null);
@@ -14,7 +14,7 @@ const User = ({ onlinePeopleExclOurUser, offlinePeople, setUserSelected }) => {
             setSelectedUserId(id);
 
         }
-    }, [offlinePeople, onlinePeopleExclOurUser]);
+    }, [offlinePeople, onlinePeople]);
     const handleClick = (userId, name, status) => {
         setSelectedUserId(userId);
         setUserSelected({ name: name, status: status })
@@ -486,15 +486,15 @@ const User = ({ onlinePeopleExclOurUser, offlinePeople, setUserSelected }) => {
                                 <ul className="list-unstyled chat-list chat-user-list">
 
 
-                                    {Object.keys(onlinePeopleExclOurUser).map((user, index) => {
-                                        if (onlinePeopleExclOurUser[user].userName !== userInfo.name) {
+                                    {Object.keys(onlinePeople).map((user, index) => {
+                                        if (onlinePeople[user].userName !== userInfo.name) {
                                             return (
                                                 <UserBar
                                                     key={user.userId}
                                                     online={true}
-                                                    username={onlinePeopleExclOurUser[user].userName}
-                                                    userid={onlinePeopleExclOurUser[user].userId}
-                                                    onlinePeopleExclOurUser={onlinePeopleExclOurUser}
+                                                    username={onlinePeople[user].userName}
+                                                    userid={onlinePeople[user].userId}
+                                                    onlinePeople={onlinePeople}
                                                     handleClick={handleClick}
                                                     selectedUserId={selectedUserId}
                                                     status={true}
