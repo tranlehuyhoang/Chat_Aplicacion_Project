@@ -1,12 +1,21 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { NavLink, useParams } from 'react-router-dom';
+import { setUserSelectedRedux } from '../../slices/userSelectedSlice';
 
-const UserBar = ({ status, username, userid, handleClick, selectedUserId, avatar }) => {
+const UserBar = ({ status, username, userid, handleClick, selectedUserId, avatar, userInfo }) => {
+    const { id } = useParams()
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (selectedUserId == userid) {
+            dispatch(setUserSelectedRedux(userInfo));
+        }
+    }, []);
     return (
         <li
             className={selectedUserId === userid ? "active" : ""}
-            onClick={() => handleClick(userid, username, status)}
+            onClick={() => handleClick(userid, username, status, userInfo)}
         >
             <NavLink to={`/${userid}`}>
                 <div className="d-flex">

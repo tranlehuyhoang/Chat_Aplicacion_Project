@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux';
 
 const NavBarUser = ({ userSelected }) => {
-    useEffect(() => {
-        console.log('userSelected', userSelected)
-    }, []);
+    const redux = useSelector((state) => state);
+    // console.log('NavBarUser', redux.userSelected.userSelected.user.avatar)
+
     return (
 
         <div className="p-3 p-lg-4 border-bottom user-chat-topbar">
@@ -20,7 +21,7 @@ const NavBarUser = ({ userSelected }) => {
                         </div>
                         <div className="me-3 ms-0">
                             <img
-                                src="assets/images/users/avatar-4.jpg"
+                                src={redux.userSelected.userSelected?.user?.avatar}
                                 className="rounded-circle avatar-xs"
                                 alt=""
                             />
@@ -28,9 +29,9 @@ const NavBarUser = ({ userSelected }) => {
                         <div className="flex-grow-1 overflow-hidden">
                             <h5 className="font-size-16 mb-0 text-truncate">
                                 <a href="#" className="text-reset user-profile-show">
-                                    {userSelected.name}
-                                </a>{" "}
-                                {userSelected.status ? (
+                                    {redux.userSelected.userSelected?.user?.username}
+                                </a>
+                                {redux.userSelected.userSelected?.status ? (
                                     <i className="ri-record-circle-fill font-size-10 text-success d-inline-block ms-1" />
                                 ) : (
                                     <i className="ri-record-circle-fill font-size-10 d-inline-block ms-1" />

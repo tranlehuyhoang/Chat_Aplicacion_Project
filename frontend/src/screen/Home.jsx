@@ -5,27 +5,29 @@ import ChatInput from '../components/common/ChatInput.jsx'
 import UserProfile from '../components/common/UserProfile.jsx'
 import Menu from '../components/common/Menu.jsx'
 import User from '../components/common/User.jsx'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import Chat from '../components/common/Chat.jsx'
 import { useGetMessageMutation } from '../slices/MessageApi.js'
 import { toast } from 'react-toastify'
 import { useGetallMutation } from '../slices/UserApi.js'
+import { setUserStatusRedux } from '../slices/userStatusSlice.js'
+import { setUserSelectedRedux } from '../slices/userSelectedSlice.js'
 
 const Home = () => {
     const divUnderMessages = useRef();
+    const dispatch = useDispatch();
     const { id } = useParams()
     const navigate = useNavigate();
+
     const [state, setstate] = useState([]);
     const [usersStatus, setUsersStatus] = useState({});
-    const [offlinePeople, setOfflinePeople] = useState({});
     const [messages, setMessagess] = useState([]);
     const [ws, setWs] = useState(null);
     const [userSelected, setUserSelected] = useState({});
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
     const [getMessage, isLoading] = useGetMessageMutation();
-    const [getall] = useGetallMutation();
 
     useEffect(() => {
         if (!userInfo) {
@@ -33,7 +35,9 @@ const Home = () => {
         }
     }, [userInfo]);
 
+
     useEffect(() => {
+
         const getMess = async () => {
             try {
                 const res = await getMessage(id).unwrap();
@@ -83,7 +87,6 @@ const Home = () => {
     function showOnlinePeople(peopleArray) {
 
         setUsersStatus(peopleArray);
-        console.log('onlinePeople', usersStatus)
     }
 
     function handleMessage(ev) {
@@ -91,6 +94,9 @@ const Home = () => {
         console.log('mess from server', messageData)
         if ('usersStatus' in messageData) {
             showOnlinePeople(messageData.usersStatus);
+            dispatch(setUserStatusRedux(messageData.usersStatus));
+
+
         } else if ('text' in messageData) {
             if (messageData.sender === id) {
                 setstate(prevs => {
@@ -108,12 +114,16 @@ const Home = () => {
 
     function sendMessage(ev, file = null) {
         console.log('file', file)
-
+        console.log('userInfo', userInfo)
+        console.log(redux.userSelected.userSelected)
         console.log({
             text: ev,
-            sender: userInfo.id,
-            recipient: id,
+            sender: userInfo,
+            recipient: redux.userSelected.userSelected,
             _id: Date.now(),
+            file: file ? file : null,
+            filename: file ? file : null,
+            image: file ? file : null,
         })
         ws.send(JSON.stringify({
             recipient: id,

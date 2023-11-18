@@ -1,11 +1,13 @@
 import React from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { logout } from '../../slices/authSlice';
 const Menu = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { userInfo } = useSelector((state) => state.auth);
+
     const handleLogout = () => {
         console.log('logout')
         dispatch(logout());
@@ -94,7 +96,7 @@ const Menu = () => {
                                 aria-expanded="false"
                             >
                                 <img
-                                    src="assets/images/users/avatar-1.jpg"
+                                    src={userInfo?.user?.avatar}
                                     alt=""
                                     className="profile-user rounded-circle"
                                 />

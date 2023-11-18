@@ -1,13 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import UserBar from './UserBar';
 import { useParams } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserSelectedRedux } from '../../slices/userSelectedSlice';
 
 const User = ({ usersStatus, setUserSelected }) => {
+    const [image, setImage] = useState('');
+
+
 
     const { id } = useParams()
+    const dispatch = useDispatch();
     const [selectedUserId, setSelectedUserId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
+    const redux = useSelector((state) => state);
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            setImage(reader.result);
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    };
     useEffect(() => {
 
         if (id) {
@@ -15,8 +34,11 @@ const User = ({ usersStatus, setUserSelected }) => {
 
         }
     }, [usersStatus]);
-    const handleClick = (userId, name, status) => {
+    const handleClick = (userId, name, status, userInfo) => {
         setSelectedUserId(userId);
+        dispatch(setUserSelectedRedux(userInfo));
+
+
         setUserSelected({ name: name, status: status })
 
     };
@@ -63,14 +85,18 @@ const User = ({ usersStatus, setUserSelected }) => {
                         </div>
                         <div className="text-center p-4 border-bottom">
                             <div className="mb-4">
-                                <img
-                                    src="assets/images/users/avatar-1.jpg"
-                                    className="rounded-circle avatar-lg img-thumbnail"
-                                    alt=""
-                                />
+                                <label htmlFor="avatarss" style={{ cursor: 'pointer' }}>
+                                    <img
+                                        src={image || (userInfo?.user?.avatar)}
+                                        className="rounded-circle avatar-lg img-thumbnail"
+                                        alt=""
+                                    />
+                                </label>
+                                <input type="file" id="avatarss" onChange={handleImageChange} hidden />
+
                             </div>
                             <h5 className="font-size-16 mb-1 text-truncate">
-                                Patricia Smith
+                                {userInfo?.user?.username}
                             </h5>
                             <p className="text-muted text-truncate mb-1">
                                 <i className="ri-record-circle-fill font-size-10 text-success me-1 ms-0 d-inline-block" />{" "}
@@ -412,21 +438,23 @@ const User = ({ usersStatus, setUserSelected }) => {
                             <div className="chat-message-list px-2" data-simplebar="">
                                 <ul className="list-unstyled chat-list chat-user-list">
                                     {Object.keys(usersStatus).map((user, index) => {
-                                        console.log('user', usersStatus[user].user)
-                                        return (
-                                            <UserBar
-                                                key={user}
-                                                status={usersStatus[user].status}
-                                                username={usersStatus[user].user.username}
-                                                userid={usersStatus[user].user._id}
-                                                usersStatus={usersStatus}
-                                                handleClick={handleClick}
-                                                selectedUserId={selectedUserId}
-                                                avatar={usersStatus[user].user.avatar}
-
-                                            />
-                                        );
-
+                                        if (userInfo?.user?._id === usersStatus[user].user._id) {
+                                            return null; // Instead of returning an empty string, return null to skip rendering
+                                        } else {
+                                            return (
+                                                <UserBar
+                                                    key={user}
+                                                    status={usersStatus[user].status}
+                                                    username={usersStatus[user].user.username}
+                                                    userid={usersStatus[user].user._id}
+                                                    usersStatus={usersStatus}
+                                                    handleClick={handleClick}
+                                                    selectedUserId={selectedUserId}
+                                                    avatar={usersStatus[user].user.avatar}
+                                                    userInfo={usersStatus[user]}
+                                                />
+                                            );
+                                        }
                                     })}
 
                                 </ul>
