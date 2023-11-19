@@ -10,6 +10,8 @@ const MessageSchema = mongoose.Schema(
         file: String,
         filename: String,
         image: String,
+        size: String,
+
     },
     {
         timestamps: true,

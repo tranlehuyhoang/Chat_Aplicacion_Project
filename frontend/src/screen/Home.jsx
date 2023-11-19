@@ -111,10 +111,12 @@ const Home = () => {
         // console.log('filteredUsers', filteredUsers[0].user)
         // console.log('redux.auth', redux.auth.userInfo.user)
         if ('usersStatus' in messageData) {
-            console.log('object')
             showOnlinePeople(messageData.usersStatus);
             dispatch(setUserStatusRedux(messageData.usersStatus));
             dispatch(setUpdateCredentials({ user: filteredUsers[0].user }));
+        } else {
+            console.log('messenger', messageData)
+
         }
 
         // } else if ('text' in messageData) {
@@ -144,28 +146,34 @@ const Home = () => {
             file: file ? file : null,
             filename: file ? file : null,
             image: file ? file : null,
+            size: file ? file : null
         })
         ws.send(JSON.stringify({
-            recipient: id,
             text: ev,
-            file,
-        }));
-        if (file) {
-            setMessagess(prev => ([...prev, {
-                text: ev,
-                sender: userInfo.id,
-                recipient: id,
-                _id: Date.now(),
-                file: file
-            }]));
-            return
-        }
-        setMessagess(prev => ([...prev, {
-            text: ev,
-            sender: userInfo.id,
-            recipient: id,
+            sender: userInfo,
+            recipient: redux.userSelected.userSelected,
             _id: Date.now(),
-        }]));
+            file: file ? file : null,
+            filename: file ? file : null,
+            image: file ? file : null,
+            size: file ? file : null
+        }));
+        // if (file) {
+        //     setMessagess(prev => ([...prev, {
+        //         text: ev,
+        //         sender: userInfo.id,
+        //         recipient: id,
+        //         _id: Date.now(),
+        //         file: file
+        //     }]));
+        //     return
+        // }
+        // setMessagess(prev => ([...prev, {
+        //     text: ev,
+        //     sender: userInfo.id,
+        //     recipient: id,
+        //     _id: Date.now(),
+        // }]));
 
     }
     function sendNewAvatar(ev, file = null) {

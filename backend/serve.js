@@ -79,8 +79,8 @@ wss.on('connection', async (connection, req) => {
 
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
-        const { recipient, text, file } = messageData;
-        // let messageDoc;
+        const { text, sender, recipient, _id, file, filename, image, size } = messageData;
+        let messageDoc;
         // let filename = null;
         // if (file) {
         //     const parts = file.name.split('.');
@@ -93,23 +93,34 @@ wss.on('connection', async (connection, req) => {
         //     });
         // }
         // if (recipient && (text || file)) {
-        //     messageDoc = await Message.create({
-        //         sender: connection.userId,
-        //         recipient,
-        //         text,
-        //         file: file ? filename : null,
-        //     });
+        messageDoc = await Message.create({
+            text,
+            sender: sender.user._id,
+            file: file ? filename : null,
+            recipient: recipient.user._id,
+            file: file ? file : null,
+            filename: file ? file : null,
+            image: file ? file : null,
+            size: file ? file : null
+        });
         // }
 
-        // [...wss.clients]
-        //     .filter(c => c.userId === recipient)
-        //     .forEach(c => c.send(JSON.stringify({
-        //         text,
-        //         sender: connection.userId,
-        //         recipient,
-        //         file: file ? filename : null,
-        //         _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
-        //     })));
+        [...wss.clients]
+            .filter(c => c.userId === recipient.user._id)
+            .forEach(c => c.send(JSON.stringify({
+                text,
+                sender: sender,
+                file: file ? filename : null,
+                _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
+                recipient: recipient,
+                _id: messageDoc ? messageDoc.createdAt : null,
+                file: file ? file : null,
+                filename: file ? file : null,
+                image: file ? file : null,
+                size: file ? file : null,
+
+
+            })));
         sendStatusUsers();
 
     });
