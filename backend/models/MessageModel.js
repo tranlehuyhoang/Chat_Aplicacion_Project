@@ -1,11 +1,27 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import User from './UserModel.js';
+import mongoose, { Schema } from 'mongoose';
 
 const MessageSchema = mongoose.Schema(
     {
-        sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        senderId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
 
-        recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        recipientId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        sender: {
+            type: Object
+        },
+
+        recipient: {
+            type: Object
+        },
         text: String,
         file: String,
         filename: String,

@@ -1,7 +1,6 @@
 import express from 'express';
 import User from './models/UserModel.js';
 import Message from './models/MessageModel.js';
-
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRouter from './routes/UserRouter.js';
@@ -48,7 +47,7 @@ async function sendStatusUsers() {
 
 wss.on('connection', async (connection, req) => {
     const cookies = req.headers.cookie;
-    console.log(cookies)
+    // console.log(cookies)
     if (!cookies) {
         return;
     }
@@ -79,49 +78,53 @@ wss.on('connection', async (connection, req) => {
 
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
-        const { text, sender, recipient, _id, file, filename, image, size } = messageData;
-        let messageDoc;
-        // let filename = null;
-        // if (file) {
-        //     const parts = file.name.split('.');
-        //     // console.log(file.data)
-        //     const ext = parts[parts.length - 1];
-        //     filename = Date.now() + '.' + ext;
-        //     const path = './uploads/' + filename;
-        //     const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
-        //     fs.writeFile(path, bufferData, () => {
-        //     });
-        // }
-        // if (recipient && (text || file)) {
-        messageDoc = await Message.create({
-            text,
-            sender: sender.user._id,
-            file: file ? filename : null,
-            recipient: recipient.user._id,
-            file: file ? file : null,
-            filename: file ? file : null,
-            image: file ? file : null,
-            size: file ? file : null
-        });
-        // }
+        // console.log(messageData)
+        if (messageData.avatar) {
+            sendStatusUsers();
 
-        [...wss.clients]
-            .filter(c => c.userId === recipient.user._id)
-            .forEach(c => c.send(JSON.stringify({
-                text,
-                sender: sender,
-                file: file ? filename : null,
-                _id: messageDoc ? messageDoc._id : null, // Assign messageDoc._id if it exists, otherwise null
-                recipient: recipient,
-                _id: messageDoc ? messageDoc.createdAt : null,
-                file: file ? file : null,
-                filename: file ? file : null,
-                image: file ? file : null,
-                size: file ? file : null,
+        } else {
+            const { text, sender, recipient, _id, file, filename, image, size } = messageData;
+            let messageDoc;
+            try {
+                // console.log(sender.user._id)
+                // console.log(recipient.user._id)
+                messageDoc = await Message.create({
+                    text,
+                    senderId: sender.user._id,
+                    sender: sender.user,
+                    file: file ? filename : null,
+                    recipientId: recipient.user._id,
+                    recipient: recipient.user,
+                    file: file ? file : null,
+                    filename: file ? file : null,
+                    image: file ? file : null,
+                    size: file ? file : null
+                });
+                console.log(messageDoc)
+            } catch (error) {
+                console.log(error)
+            }
 
 
-            })));
-        sendStatusUsers();
+
+            [...wss.clients]
+                .filter(c => c.userId === recipient.user._id)
+                .forEach(c => c.send(JSON.stringify({
+                    text,
+                    sender: sender,
+                    file: file ? filename : null,
+                    recipient: recipient,
+                    _id: messageDoc ? messageDoc.createdAt : null,
+                    file: file ? file : null,
+                    filename: file ? file : null,
+                    image: file ? file : null,
+                    size: file ? file : null,
+
+
+                })));
+            sendStatusUsers();
+        }
+
 
     });
     connection.on('close', () => {

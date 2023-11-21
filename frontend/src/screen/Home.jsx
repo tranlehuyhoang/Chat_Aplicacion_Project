@@ -106,42 +106,32 @@ const Home = () => {
 
     function handleMessage(ev) {
         const messageData = JSON.parse(ev.data);
-        console.log('mess from server', messageData)
-        const filteredUsers = messageData.usersStatus.filter(user => user.user._id === redux.auth.userInfo.user._id);
+        // console.log('mess from server', messageData)
+        // console.log(messageData.text)
         // console.log('filteredUsers', filteredUsers[0].user)
         // console.log('redux.auth', redux.auth.userInfo.user)
         if ('usersStatus' in messageData) {
+            const filteredUsers = messageData.usersStatus.filter(user => user.user._id === redux.auth.userInfo.user._id);
+            // console.log('usersStatus from server', messageData)
+
             showOnlinePeople(messageData.usersStatus);
             dispatch(setUserStatusRedux(messageData.usersStatus));
             dispatch(setUpdateCredentials({ user: filteredUsers[0].user }));
-        } else {
-            console.log('messenger', messageData)
+        }
+        if (messageData.text) {
+            console.log('mess')
+            setMessagess(prev => [...prev, { ...messageData }]);
 
         }
 
-        // } else if ('text' in messageData) {
-        //     if (messageData.sender === id) {
-        //         setstate(prevs => {
-        //             if (Array.isArray(prevs)) {
-        //                 return [...prevs, id];
-        //             } else {
-        //                 return [prevs, id];
-        //             }
-        //         });
-        //         setMessagess(prev => ([...prev, messageData]));
-
-        //     }
-        // }
     }
 
     function sendMessage(ev, file = null) {
-        console.log('file', file)
-        console.log('userInfo', userInfo)
-        console.log(redux.userSelected.userSelected)
+
         console.log({
             text: ev,
-            sender: userInfo,
-            recipient: redux.userSelected.userSelected,
+            sender: userInfo.user,
+            recipient: redux.userSelected.userSelected.user,
             _id: Date.now(),
             file: file ? file : null,
             filename: file ? file : null,
@@ -158,22 +148,17 @@ const Home = () => {
             image: file ? file : null,
             size: file ? file : null
         }));
-        // if (file) {
-        //     setMessagess(prev => ([...prev, {
-        //         text: ev,
-        //         sender: userInfo.id,
-        //         recipient: id,
-        //         _id: Date.now(),
-        //         file: file
-        //     }]));
-        //     return
-        // }
-        // setMessagess(prev => ([...prev, {
-        //     text: ev,
-        //     sender: userInfo.id,
-        //     recipient: id,
-        //     _id: Date.now(),
-        // }]));
+        setMessagess(prev => [...prev, {
+            text: ev,
+            sender: userInfo.user,
+            recipient: redux.userSelected.userSelected.user,
+            _id: Date.now(),
+            file: file ? file : null,
+            filename: file ? file : null,
+            image: file ? file : null,
+            size: file ? file : null
+        }]);
+
 
     }
     function sendNewAvatar(ev, file = null) {
