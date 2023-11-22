@@ -1,6 +1,8 @@
 import React from 'react'
 import { useParams } from 'react-router'
-
+import Messenger from './content/Messenger.jsx'
+import FileMess from './content/FileMess.jsx'
+import Image from './content/Image.jsx'
 const Chat = ({ messages, divUnderMessages }) => {
     const { id } = useParams()
     return (
@@ -10,7 +12,10 @@ const Chat = ({ messages, divUnderMessages }) => {
                     console.log(message);
                     return (
                         <div key={index}>
-                            <div>{message.text}</div>
+                            {!message.image && !message.file ? <Messenger message={message} /> : ''}
+                            {message.image ? <Image message={message} /> : ''}
+                            {message.file ? <FileMess message={message} /> : ''}
+
                         </div>
                     );
                 })}

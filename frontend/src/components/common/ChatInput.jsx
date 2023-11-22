@@ -3,18 +3,48 @@ import React, { useState } from 'react'
 const ChatInput = ({ sendMessage }) => {
 
     function sendFile(ev) {
-        const reader = new FileReader();
-        reader.readAsDataURL(ev.target.files[0]);
-        reader.onload = () => {
-            sendMessage(
-                ev.target.files[0].name,
-                {
-                    name: ev.target.files[0].name,
-                    data: reader.result,
-                }
-            );
-        };
+        const file = ev.target.files[0];
+        const fileName = file.name;
+        const fileSize = file.size;
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (imageExtensions.includes(fileExtension)) {
+            // File is an image
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                sendMessage(
+                    null,
+                    {
+
+
+                        file: null,
+                        filename: null,
+                        image: reader.result,
+                        size: fileSize,
+                    }
+                );
+            };
+        } else {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                sendMessage(
+                    ev.target.files[0].name,
+                    {
+                        file: reader.result,
+                        filename: ev.target.files[0].name,
+                        image: null,
+                        size: fileSize,
+                    }
+                );
+            };
+        }
     }
+
+
 
 
 

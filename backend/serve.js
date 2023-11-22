@@ -86,21 +86,20 @@ wss.on('connection', async (connection, req) => {
             const { text, sender, recipient, _id, file, filename, image, size } = messageData;
             let messageDoc;
             try {
-                // console.log(sender.user._id)
+                console.log(sender.user._id)
                 // console.log(recipient.user._id)
                 messageDoc = await Message.create({
                     text,
                     senderId: sender.user._id,
                     sender: sender.user,
-                    file: file ? filename : null,
                     recipientId: recipient.user._id,
                     recipient: recipient.user,
                     file: file ? file : null,
-                    filename: file ? file : null,
-                    image: file ? file : null,
-                    size: file ? file : null
+                    filename: filename ? filename : null,
+                    image: image ? image : null,
+                    size: size ? size : null
                 });
-                console.log(messageDoc)
+                // console.log(messageDoc)
             } catch (error) {
                 console.log(error)
             }
@@ -111,14 +110,13 @@ wss.on('connection', async (connection, req) => {
                 .filter(c => c.userId === recipient.user._id)
                 .forEach(c => c.send(JSON.stringify({
                     text,
-                    sender: sender,
-                    file: file ? filename : null,
-                    recipient: recipient,
+                    sender: sender.user,
+                    recipient: recipient.user,
                     _id: messageDoc ? messageDoc.createdAt : null,
                     file: file ? file : null,
-                    filename: file ? file : null,
-                    image: file ? file : null,
-                    size: file ? file : null,
+                    filename: filename ? filename : null,
+                    image: image ? image : null,
+                    size: size ? size : null,
 
 
                 })));

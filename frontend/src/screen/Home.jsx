@@ -26,15 +26,20 @@ const Home = () => {
     const [userSelected, setUserSelected] = useState({});
     const redux = useSelector((state) => state);
     const { userInfo } = useSelector((state) => state.auth);
+    // const { userInfo_id } = useSelector((state) => state.auth.user?._id);
     const [getMessage, isLoading] = useGetMessageMutation();
 
-    useEffect(() => {
+    if (!userInfo) {
+        console.log(null)
+        navigate('login')
 
+    }
+    useEffect(() => {
 
         if (!userInfo) {
             navigate('/login')
         }
-    }, [userInfo.user._id]);
+    }, [userInfo?.user?._id]);
 
 
     useEffect(() => {
@@ -119,6 +124,7 @@ const Home = () => {
             dispatch(setUpdateCredentials({ user: filteredUsers[0].user }));
         }
         if (messageData.text) {
+            console.log('messageData', messageData)
             console.log('mess')
             setMessagess(prev => [...prev, { ...messageData }]);
 
@@ -133,30 +139,33 @@ const Home = () => {
             sender: userInfo.user,
             recipient: redux.userSelected.userSelected.user,
             _id: Date.now(),
-            file: file ? file : null,
-            filename: file ? file : null,
-            image: file ? file : null,
-            size: file ? file : null
+            file: file?.file ? file.file : null,
+            filename: file?.filename ? file.filename : null,
+            image: file?.image ? file.image : null,
+            size: file?.size ? file.size : null,
+            createdAt: new Date(Date.now()).toISOString()
+
         })
         ws.send(JSON.stringify({
             text: ev,
             sender: userInfo,
             recipient: redux.userSelected.userSelected,
             _id: Date.now(),
-            file: file ? file : null,
-            filename: file ? file : null,
-            image: file ? file : null,
-            size: file ? file : null
+            file: file?.file ? file.file : null,
+            filename: file?.filename ? file.filename : null,
+            image: file?.image ? file.image : null,
+            size: file?.size ? file.size : null
         }));
         setMessagess(prev => [...prev, {
             text: ev,
             sender: userInfo.user,
             recipient: redux.userSelected.userSelected.user,
             _id: Date.now(),
-            file: file ? file : null,
-            filename: file ? file : null,
-            image: file ? file : null,
-            size: file ? file : null
+            file: file?.file ? file.file : null,
+            filename: file?.filename ? file.filename : null,
+            image: file?.image ? file.image : null,
+            size: file?.size ? file.size : null,
+            createdAt: new Date(Date.now()).toISOString()
         }]);
 
 
