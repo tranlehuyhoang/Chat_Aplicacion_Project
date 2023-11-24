@@ -9,7 +9,7 @@ const Chat = ({ messages, divUnderMessages }) => {
         <div className="chat-conversation p-3 p-lg-4" data-simplebar="init">
             <ul className="list-unstyled" style={{ marginBottom: '100px' }}>
                 {messages.map((message, index) => {
-                    console.log(message);
+
                     return (
                         <div key={index}>
                             {!message.image && !message.file ? <Messenger message={message} /> : ''}

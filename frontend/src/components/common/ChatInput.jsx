@@ -21,7 +21,7 @@ const ChatInput = ({ sendMessage }) => {
 
 
                         file: null,
-                        filename: null,
+                        filename: file.name,
                         image: reader.result,
                         size: fileSize,
                     }

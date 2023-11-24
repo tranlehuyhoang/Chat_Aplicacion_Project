@@ -84,9 +84,23 @@ wss.on('connection', async (connection, req) => {
 
         } else {
             const { text, sender, recipient, _id, file, filename, image, size } = messageData;
+            console.log('send image')
             let messageDoc;
+            let image_name = null
+
+            if (image) {
+
+                const parts = filename.split('.');
+                const ext = parts[parts.length - 1];
+                image_name = Date.now() + '.' + ext;
+                const path = './uploads/' + image_name;
+                const bufferData = Buffer.from(image.split(',')[1], 'base64');
+                fs.writeFile(path, bufferData, () => {
+                });
+            }
+
             try {
-                console.log(sender.user._id)
+                // console.log(sender.user._id)
                 // console.log(recipient.user._id)
                 messageDoc = await Message.create({
                     text,
@@ -96,7 +110,7 @@ wss.on('connection', async (connection, req) => {
                     recipient: recipient.user,
                     file: file ? file : null,
                     filename: filename ? filename : null,
-                    image: image ? image : null,
+                    image: image_name ? image_name : null,
                     size: size ? size : null
                 });
                 // console.log(messageDoc)
@@ -105,7 +119,18 @@ wss.on('connection', async (connection, req) => {
             }
 
 
+            console.log({
+                text,
+                sender: sender.user,
+                recipient: recipient.user,
+                _id: messageDoc ? messageDoc.createdAt : null,
+                file: file ? file : null,
+                filename: filename ? filename : null,
+                image: image_name ? image_name : null,
+                size: size ? size : null,
 
+
+            });
             [...wss.clients]
                 .filter(c => c.userId === recipient.user._id)
                 .forEach(c => c.send(JSON.stringify({
@@ -115,7 +140,7 @@ wss.on('connection', async (connection, req) => {
                     _id: messageDoc ? messageDoc.createdAt : null,
                     file: file ? file : null,
                     filename: filename ? filename : null,
-                    image: image ? image : null,
+                    image: image_name ? image_name : null,
                     size: size ? size : null,
 
 

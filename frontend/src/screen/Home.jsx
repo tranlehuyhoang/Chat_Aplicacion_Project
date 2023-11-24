@@ -123,7 +123,7 @@ const Home = () => {
             dispatch(setUserStatusRedux(messageData.usersStatus));
             dispatch(setUpdateCredentials({ user: filteredUsers[0].user }));
         }
-        if (messageData.text) {
+        if (messageData.text || messageData.image) {
             console.log('messageData', messageData)
             console.log('mess')
             setMessagess(prev => [...prev, { ...messageData }]);
