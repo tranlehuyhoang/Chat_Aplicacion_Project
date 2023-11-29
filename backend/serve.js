@@ -46,9 +46,10 @@ async function sendStatusUsers() {
 }
 
 wss.on('connection', async (connection, req) => {
-    console.log(connection, req)
+    // console.log(connection, req)
     const cookies = req.headers.cookie;
-    // console.log(cookies)
+    console.log(cookies)
+
     if (!cookies) {
         return;
     }
