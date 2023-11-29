@@ -44,6 +44,9 @@ async function sendStatusUsers() {
         .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
 
 }
+wss.on('listening', () => {
+    console.log('WebSocket server is running');
+});
 
 wss.on('connection', async (connection, req) => {
     const cookies = req.headers.cookie;
