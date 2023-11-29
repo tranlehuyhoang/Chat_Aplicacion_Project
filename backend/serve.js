@@ -16,7 +16,7 @@ import fs from 'fs'
 
 dotenv.config();
 connectDB();
-const port = 8000 || 3000;
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors());
@@ -29,7 +29,7 @@ app.use('/api/user', userRouter);
 app.use('/api/message', messageRouter);
 app.use(notFound);
 app.use(errorHandler);
-const server = app.listen(8000, () => console.log(`Server running on port ${8000}`));
+const server = app.listen(port, () => console.log(`Server running on port ${port}`));
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
 
 async function sendStatusUsers() {
@@ -44,11 +44,9 @@ async function sendStatusUsers() {
         .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
 
 }
-wss.on('listening', () => {
-    console.log('WebSocket server is running');
-});
 
 wss.on('connection', async (connection, req) => {
+    console.log(connection, req)
     const cookies = req.headers.cookie;
     // console.log(cookies)
     if (!cookies) {

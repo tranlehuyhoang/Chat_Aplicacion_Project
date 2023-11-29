@@ -78,7 +78,7 @@ const Home = () => {
         if (!userInfo) {
             return
         }
-        const ws = new WebSocket('ws://localhost:8000');
+        const ws = new WebSocket('wss://chatdeploysocketserver.onrender.com');
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
