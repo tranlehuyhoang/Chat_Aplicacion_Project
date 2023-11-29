@@ -87,6 +87,7 @@ wss.on('connection', async (connection, req) => {
             console.log('send image')
             let messageDoc;
             let image_name = null
+            let file_name = null
 
             if (image) {
 
@@ -95,6 +96,16 @@ wss.on('connection', async (connection, req) => {
                 image_name = Date.now() + '.' + ext;
                 const path = './uploads/' + image_name;
                 const bufferData = Buffer.from(image.split(',')[1], 'base64');
+                fs.writeFile(path, bufferData, () => {
+                });
+            }
+            if (file) {
+
+                const parts = filename.split('.');
+                const ext = parts[parts.length - 1];
+                file_name = Date.now() + '.' + ext;
+                const path = './uploads/' + file_name;
+                const bufferData = Buffer.from(file.split(',')[1], 'base64');
                 fs.writeFile(path, bufferData, () => {
                 });
             }
@@ -124,8 +135,8 @@ wss.on('connection', async (connection, req) => {
                 sender: sender.user,
                 recipient: recipient.user,
                 _id: messageDoc ? messageDoc.createdAt : null,
-                file: file ? file : null,
-                filename: filename ? filename : null,
+                file: file_name ? file_name : null,
+                filename: file_name ? file_name : null,
                 image: image_name ? image_name : null,
                 size: size ? size : null,
 
@@ -138,8 +149,8 @@ wss.on('connection', async (connection, req) => {
                     sender: sender.user,
                     recipient: recipient.user,
                     _id: messageDoc ? messageDoc.createdAt : null,
-                    file: file ? file : null,
-                    filename: filename ? filename : null,
+                    file: file_name ? file_name : null,
+                    filename: file_name ? file_name : null,
                     image: image_name ? image_name : null,
                     size: size ? size : null,
 

@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 
 const FileMess = ({ message }) => {
     const { id } = useParams()
-
+    var message_img_sender = message.file
     return (
         <div>
             <li className={message.sender._id !== id ? 'right' : ''}>
@@ -25,19 +25,20 @@ const FileMess = ({ message }) => {
                                         <div className="flex-grow-1 overflow-hidden">
                                             <div className="text-start">
                                                 <h5 className="font-size-14 text-truncate mb-1">
-                                                    admin_v1.0.zip
+                                                    {message.text}
                                                 </h5>
                                                 <p className="text-muted text-truncate font-size-13 mb-0">
-                                                    12.5 MB
+                                                    {message.size}
+
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="ms-4 me-0">
-                                            <div className="d-flex gap-2 font-size-20 d-flex align-items-start">
+                                            <div className="d-flex gap-2 font-size-20 d-flex align-items-s  tart">
                                                 <div>
                                                     <a
-                                                        download="admin_v1.0.zip"
-                                                        href="assets/images/small/admin_v1.0.zip"
+                                                        download
+                                                        href={message_img_sender.startsWith("data:") ? message.file : `http://localhost:8000/${message.file}`}
                                                         className="fw-medium"
                                                     >
                                                         <i className="ri-download-2-line" />

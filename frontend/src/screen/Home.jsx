@@ -78,7 +78,7 @@ const Home = () => {
         if (!userInfo) {
             return
         }
-        const ws = new WebSocket('ws://localhost:5000');
+        const ws = new WebSocket('ws://localhost:8000/');
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
@@ -110,9 +110,9 @@ const Home = () => {
     //         // console.log('filteredUsers', filteredUsers)
 
     function handleMessage(ev) {
+        console.log(ev)
         const messageData = JSON.parse(ev.data);
         // console.log('mess from server', messageData)
-        // console.log(messageData.text)
         // console.log('filteredUsers', filteredUsers[0].user)
         // console.log('redux.auth', redux.auth.userInfo.user)
         if ('usersStatus' in messageData) {

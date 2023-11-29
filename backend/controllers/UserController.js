@@ -88,7 +88,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
         fs.writeFile(path, bufferData, () => {
         });
         try {
-            await User.findByIdAndUpdate(userid, { $set: { avatar: 'http://localhost:5000/' + file_name } });
+            await User.findByIdAndUpdate(userid, { $set: { avatar: 'http://localhost:8000/' + file_name } });
             res.status(200).json({ message: 'Avatar updated successfully.' });
         } catch (error) {
             console.error(error);
