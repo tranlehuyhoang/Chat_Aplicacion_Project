@@ -1,3 +1,6 @@
+
+// console.log('req.headers.cookie', req.headers.cookie)
+// console.log('req.cookies', req.cookies)
 import express from 'express';
 import User from './models/UserModel.js';
 import Message from './models/MessageModel.js';
@@ -10,27 +13,30 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-
 import fs from 'fs'
 
 
 dotenv.config();
 connectDB();
-const port = process.env.PORT || 3000;
+const port = 8000 || 3000;
 const app = express();
 
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static('./uploads'));
+app.use(express.static('./upload'));
 app.get('/', (req, res) => res.send('Server ready'));
 app.use('/api/user', userRouter);
 app.use('/api/message', messageRouter);
 app.use(notFound);
 app.use(errorHandler);
-const server = app.listen(port, () => console.log(`Server running on port ${port}`));
+const server = app.listen(8000, () => console.log(`Server running on port ${8000}`));
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
+
+
+
+
 
 async function sendStatusUsers() {
     const users = await User.find();
@@ -44,13 +50,14 @@ async function sendStatusUsers() {
         .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
 
 }
+wss.on('listening', () => {
+    console.log('WebSocket server is running');
+});
 
 wss.on('connection', async (connection, req) => {
-    // console.log(connection, req)
     const cookies = req.headers.cookie;
     console.log('req.headers.cookie', req.headers.cookie)
     console.log('req.cookies', req.cookies)
-
     if (!cookies) {
         return;
     }
@@ -93,11 +100,10 @@ wss.on('connection', async (connection, req) => {
             let file_name = null
 
             if (image) {
-
                 const parts = filename.split('.');
                 const ext = parts[parts.length - 1];
                 image_name = Date.now() + '.' + ext;
-                const path = './uploads/' + image_name;
+                const path = './upload/' + image_name;
                 const bufferData = Buffer.from(image.split(',')[1], 'base64');
                 fs.writeFile(path, bufferData, () => {
                 });
@@ -107,7 +113,7 @@ wss.on('connection', async (connection, req) => {
                 const parts = filename.split('.');
                 const ext = parts[parts.length - 1];
                 file_name = Date.now() + '.' + ext;
-                const path = './uploads/' + file_name;
+                const path = './upload/' + file_name;
                 const bufferData = Buffer.from(file.split(',')[1], 'base64');
                 fs.writeFile(path, bufferData, () => {
                 });
