@@ -25,6 +25,7 @@ const Home = () => {
     const [ws, setWs] = useState(null);
     const [userSelected, setUserSelected] = useState({});
     const redux = useSelector((state) => state);
+
     const { userInfo } = useSelector((state) => state.auth);
     // const { userInfo_id } = useSelector((state) => state.auth.user?._id);
     const [getMessage, isLoading] = useGetMessageMutation();
@@ -78,8 +79,9 @@ const Home = () => {
         if (!userInfo) {
             return
         }
+        const cookies = document.cookie;
         const ws = new WebSocket('ws://localhost:8000');
-        console.log(ws)
+
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);

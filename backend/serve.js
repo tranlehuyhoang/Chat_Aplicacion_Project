@@ -55,6 +55,8 @@ wss.on('listening', () => {
 });
 
 wss.on('connection', async (connection, req) => {
+    // const protocols = req.headers['sec-websocket-protocol'];
+    // console.log('Received handshake with protocols:', protocols);
     const cookies = req.headers.cookie;
     console.log('req.headers.cookie', req.headers.cookie)
     console.log('req.cookies', req.cookies)
