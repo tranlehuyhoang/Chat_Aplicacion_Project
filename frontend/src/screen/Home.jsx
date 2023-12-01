@@ -80,7 +80,7 @@ const Home = () => {
             return
         }
 
-        const ws = new WebSocket('ws://localhost:8000');
+        const ws = new WebSocket('wss://server-chat-mern.onrender.com');
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
