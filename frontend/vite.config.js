@@ -8,11 +8,11 @@ export default defineConfig({
 
   server: {
     port: 4000,
-    proxy: {
-      '/api': {
-        target: 'https://server-chat-mern.onrender.com/',
-        changeOrigin: true,
-      },
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:8000/',
+    //     changeOrigin: true,
+    //   },
+    // },
   },
 });

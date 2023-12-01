@@ -80,7 +80,8 @@ const Home = () => {
             return
         }
 
-        const ws = new WebSocket('wss://server-chat-mern.onrender.com');
+        const ws = new WebSocket('ws://localhost:8000');
+
         setWs(ws);
         ws.addEventListener('open', handleOpen);
         ws.addEventListener('message', handleMessage);
@@ -93,10 +94,7 @@ const Home = () => {
     }
 
     function handleOpen() {
-        ws.send(JSON.stringify({
-            cookies: document.cookie,
 
-        }));
         console.log('WebSocket connection opened');
     }
 
@@ -152,6 +150,10 @@ const Home = () => {
             createdAt: new Date(Date.now()).toISOString()
 
         })
+        ws.send(JSON.stringify({
+            cookies: document.cookie,
+
+        }));
         ws.send(JSON.stringify({
             text: ev,
             sender: userInfo,

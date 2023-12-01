@@ -14,7 +14,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import fs from 'fs'
-
+import path from 'path';
 
 dotenv.config();
 connectDB();
@@ -25,7 +25,16 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static('./upload'));
+// app.use(express.static(path.join(__dirname, 'upload')));
+
+// Serve static files from the 'client/dist' directory
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+// Route all other requests to the index.html file
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+
 app.get('/', (req, res) => res.send('Server ready'));
 app.use('/api/user', userRouter);
 app.use('/api/message', messageRouter);
@@ -33,11 +42,6 @@ app.use(notFound);
 app.use(errorHandler);
 const server = app.listen(8000, () => console.log(`Server running on port ${8000}`));
 const wss = new WebSocketServer({ server, clientTracking: true, perMessageDeflate: false });
-
-
-
-
-
 async function sendStatusUsers() {
     const users = await User.find();
     const onlineUsers = [...wss.clients]
@@ -45,7 +49,6 @@ async function sendStatusUsers() {
         const status = onlineUsers.some(client => user._id.toString() === client.userId)
         return { user, status };
     });
-
     [...wss.clients]
         .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
 
@@ -55,18 +58,11 @@ wss.on('listening', () => {
 });
 
 wss.on('connection', async (connection, req) => {
-
     const cookies = req.headers.cookie;
-    console.log('req.headers', req.headers)
-    // console.log(cookies)
-
     if (!cookies) {
-        return;
+        return
     }
     const cookiePairs = cookies.split(';');
-    connection.on('message', async (message) => {
-        const messageData = JSON.parse(message.toString());
-    })
     let jwtValue = null;
     for (const pair of cookiePairs) {
         const [name, value] = pair.trim().split('=');
@@ -80,6 +76,7 @@ wss.on('connection', async (connection, req) => {
             const decoded = jwt.verify(jwtValue, process.env.JWT_SECRET);
             const user = await User.findOne({ _id: decoded.userId });
             connection.userId = decoded.userId;
+
             connection.user = user;
         } catch (error) {
             connection.send(error.message);
@@ -88,24 +85,18 @@ wss.on('connection', async (connection, req) => {
         connection.send('Not authorized, no token');
         connection.close();
     }
-
     sendStatusUsers();
-
     connection.on('message', async (message) => {
         const messageData = JSON.parse(message.toString());
-        // console.log(messageData)
+        console.log(messageData.cookies)
+        console.log(messageData.cookies)
         if (messageData.avatar) {
             sendStatusUsers();
-
         } else if (!messageData.cookies) {
-
-
             const { text, sender, recipient, _id, file, filename, image, size } = messageData;
-            // console.log('send image')
             let messageDoc;
             let image_name = null
             let file_name = null
-
             if (image) {
                 const parts = filename.split('.');
                 const ext = parts[parts.length - 1];
@@ -125,8 +116,6 @@ wss.on('connection', async (connection, req) => {
                 });
             }
             try {
-                // console.log(sender.user._id)
-                // console.log(recipient.user._id)
                 messageDoc = await Message.create({
                     text,
                     senderId: sender.user._id,
@@ -138,22 +127,9 @@ wss.on('connection', async (connection, req) => {
                     image: image ? image : null,
                     size: size ? size : null
                 });
-                // console.log(messageDoc)
             } catch (error) {
                 console.log(error)
             }
-            // console.log({
-            //     text,
-            //     sender: sender.user,
-            //     recipient: recipient.user,
-            //     _id: messageDoc ? messageDoc.createdAt : null,
-            //     file: file_name ? file_name : null,
-            //     filename: file_name ? file_name : null,
-            //     image: image_name ? image_name : null,
-            //     size: size ? size : null,
-
-
-            // });
             [...wss.clients]
                 .filter(c => c.userId === recipient.user._id)
                 .forEach(c => c.send(JSON.stringify({
@@ -165,13 +141,9 @@ wss.on('connection', async (connection, req) => {
                     filename: file_name ? file_name : null,
                     image: image ? image : null,
                     size: size ? size : null,
-
-
                 })));
             sendStatusUsers();
         }
-
-
     });
     connection.on('close', () => {
         sendStatusUsers();

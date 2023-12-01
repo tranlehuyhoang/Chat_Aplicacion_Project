@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./backend/serve.js"
+    "start": "nodemon ./backend/serve.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "author": "",
   "license": "ISC",
