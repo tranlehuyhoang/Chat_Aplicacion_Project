@@ -21,11 +21,11 @@ const Image = ({ message }) => {
                                         <div>
                                             <a
                                                 className="popup-img d-inline-block m-1"
-                                                href={message_img_sender.startsWith("data:") ? message_img_sender : `http://localhost:8000/${message.image}`}
+                                                href={message_img_sender}
                                                 title="Project 2"
                                             >
                                                 <img
-                                                    src={message_img_sender.startsWith("data:") ? message_img_sender : `http://localhost:8000/${message.image}`}
+                                                    src={message_img_sender}
                                                     alt=""
                                                     className="rounded border"
                                                 />

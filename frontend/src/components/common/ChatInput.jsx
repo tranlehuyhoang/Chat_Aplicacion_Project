@@ -56,10 +56,9 @@ const ChatInput = ({ sendMessage }) => {
                 <div className="row g-0">
                     <div className="col">
 
-                        <input
+                        <textarea
                             value={newMessageText}
-                            onChange={ev => { setNewMessageText(ev.target.value) }}
-                            type="text"
+                            onChange={ev => setNewMessageText(ev.target.value)}
                             className="form-control form-control-lg bg-light border-light"
                             placeholder="Enter Message..."
                         />

@@ -55,11 +55,14 @@ wss.on('listening', () => {
 });
 
 wss.on('connection', async (connection, req) => {
-    // const protocols = req.headers['sec-websocket-protocol'];
-    // console.log('Received handshake with protocols:', protocols);
+    connection.on('message', async (message) => {
+        const messageData = JSON.parse(message.toString());
+        const { cookies } = messageData;
+
+    })
     const cookies = req.headers.cookie;
-    console.log('req.headers.cookie', req.headers.cookie)
-    console.log('req.cookies', req.cookies)
+    console.log(cookies)
+
     if (!cookies) {
         return;
     }
@@ -132,7 +135,7 @@ wss.on('connection', async (connection, req) => {
                     recipient: recipient.user,
                     file: file ? file : null,
                     filename: filename ? filename : null,
-                    image: image_name ? image_name : null,
+                    image: image ? image : null,
                     size: size ? size : null
                 });
                 // console.log(messageDoc)

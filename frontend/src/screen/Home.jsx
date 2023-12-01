@@ -79,7 +79,7 @@ const Home = () => {
         if (!userInfo) {
             return
         }
-        const cookies = document.cookie;
+
         const ws = new WebSocket('ws://localhost:8000');
 
         setWs(ws);
