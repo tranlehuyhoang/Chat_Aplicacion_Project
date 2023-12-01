@@ -14,27 +14,28 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import fs from 'fs'
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 dotenv.config();
 connectDB();
 const port = 8000 || 3000;
 const app = express();
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-// app.use(express.static(path.join(__dirname, 'upload')));
+app.use(express.static(join(__dirname, 'upload')));
 
 // Serve static files from the 'client/dist' directory
-app.use(express.static(path.join(__dirname, '/client/dist')));
+app.use(express.static(join(__dirname, 'client', 'dist')));
 
 // Route all other requests to the index.html file
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+    res.sendFile(join(__dirname, 'client', 'dist', 'index.html'));
 });
-
 app.get('/', (req, res) => res.send('Server ready'));
 app.use('/api/user', userRouter);
 app.use('/api/message', messageRouter);
