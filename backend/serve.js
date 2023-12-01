@@ -45,7 +45,7 @@ async function sendStatusUsers() {
         const status = onlineUsers.some(client => user._id.toString() === client.userId)
         return { user, status };
     });
-    // console.log('usersStatus', usersStatus);
+
     [...wss.clients]
         .forEach(c => c.send(JSON.stringify({ usersStatus: usersStatus })));
 
@@ -55,11 +55,7 @@ wss.on('listening', () => {
 });
 
 wss.on('connection', async (connection, req) => {
-    connection.on('message', async (message) => {
-        const messageData = JSON.parse(message.toString());
-        const { cookies } = messageData;
 
-    })
     const cookies = req.headers.cookie;
     console.log(cookies)
 
@@ -67,6 +63,9 @@ wss.on('connection', async (connection, req) => {
         return;
     }
     const cookiePairs = cookies.split(';');
+    connection.on('message', async (message) => {
+        const messageData = JSON.parse(message.toString());
+    })
     let jwtValue = null;
     for (const pair of cookiePairs) {
         const [name, value] = pair.trim().split('=');
@@ -97,7 +96,9 @@ wss.on('connection', async (connection, req) => {
         if (messageData.avatar) {
             sendStatusUsers();
 
-        } else {
+        } else if (!messageData.cookies) {
+
+
             const { text, sender, recipient, _id, file, filename, image, size } = messageData;
             console.log('send image')
             let messageDoc;
@@ -114,7 +115,6 @@ wss.on('connection', async (connection, req) => {
                 });
             }
             if (file) {
-
                 const parts = filename.split('.');
                 const ext = parts[parts.length - 1];
                 file_name = Date.now() + '.' + ext;
@@ -123,7 +123,6 @@ wss.on('connection', async (connection, req) => {
                 fs.writeFile(path, bufferData, () => {
                 });
             }
-
             try {
                 // console.log(sender.user._id)
                 // console.log(recipient.user._id)
@@ -142,8 +141,6 @@ wss.on('connection', async (connection, req) => {
             } catch (error) {
                 console.log(error)
             }
-
-
             console.log({
                 text,
                 sender: sender.user,
