@@ -160,9 +160,9 @@ wss.on('connection', async (connection, req) => {
                     sender: sender.user,
                     recipient: recipient.user,
                     _id: messageDoc ? messageDoc.createdAt : null,
-                    file: file_name ? file_name : null,
+                    file: file ? file : null,
                     filename: file_name ? file_name : null,
-                    image: image_name ? image_name : null,
+                    image: image ? image : null,
                     size: size ? size : null,
 
 

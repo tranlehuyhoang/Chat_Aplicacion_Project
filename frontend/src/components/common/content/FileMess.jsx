@@ -38,7 +38,7 @@ const FileMess = ({ message }) => {
                                                 <div>
                                                     <a
                                                         download
-                                                        href={message_img_sender.startsWith("data:") ? message.file : `http://localhost:8000/${message.file}`}
+                                                        href={message.file}
                                                         className="fw-medium"
                                                     >
                                                         <i className="ri-download-2-line" />
