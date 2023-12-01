@@ -57,7 +57,8 @@ wss.on('listening', () => {
 wss.on('connection', async (connection, req) => {
 
     const cookies = req.headers.cookie;
-    console.log(cookies)
+    console.log('req.headers', req.headers)
+    // console.log(cookies)
 
     if (!cookies) {
         return;
@@ -100,7 +101,7 @@ wss.on('connection', async (connection, req) => {
 
 
             const { text, sender, recipient, _id, file, filename, image, size } = messageData;
-            console.log('send image')
+            // console.log('send image')
             let messageDoc;
             let image_name = null
             let file_name = null
@@ -141,18 +142,18 @@ wss.on('connection', async (connection, req) => {
             } catch (error) {
                 console.log(error)
             }
-            console.log({
-                text,
-                sender: sender.user,
-                recipient: recipient.user,
-                _id: messageDoc ? messageDoc.createdAt : null,
-                file: file_name ? file_name : null,
-                filename: file_name ? file_name : null,
-                image: image_name ? image_name : null,
-                size: size ? size : null,
+            // console.log({
+            //     text,
+            //     sender: sender.user,
+            //     recipient: recipient.user,
+            //     _id: messageDoc ? messageDoc.createdAt : null,
+            //     file: file_name ? file_name : null,
+            //     filename: file_name ? file_name : null,
+            //     image: image_name ? image_name : null,
+            //     size: size ? size : null,
 
 
-            });
+            // });
             [...wss.clients]
                 .filter(c => c.userId === recipient.user._id)
                 .forEach(c => c.send(JSON.stringify({
